@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Tills{% endblock %}
+{% block body %}
+    <div>
+        <p>{{ object.till.name }}</p>
+        <p>Closed at {{ object.close_time }}</p>
+
+        <h4>Takings</h4>
+        <p>Cash {{ object.cash_takings }}<p>
+        <p>Card {{ object.card_takings }}<p>
+        <p>Total {{ object.total_takings }}<p>
+
+        <h4>Till contents</h4>
+        <p>{{ object.note_50GBP }} x £50 worth {{ object.note_50GBP.pretty_value }}<p>
+        <p>{{ object.note_20GBP }} x £20 worth {{ object.note_20GBP.pretty_value }}<p>
+        <p>{{ object.note_10GBP }} x £10 worth {{ object.note_10GBP.pretty_value }}<p>
+        <p>{{ object.note_5GBP }} x £5 worth {{ object.note_5GBP.pretty_value }}<p>
+        <p>{{ object.coin_2GBP }} x £2 worth {{ object.coin_2GBP.pretty_value }}<p>
+        <p>{{ object.coin_1GBP }} x £1 worth {{ object.coin_1GBP.pretty_value }}<p>
+        <p>{{ object.coin_50p }} x 50p worth {{ object.coin_50p.pretty_value }}<p>
+        <p>{{ object.coin_20p }} x 20p worth {{ object.coin_20p.pretty_value }}<p>
+        <p>{{ object.coin_10p }} x 10p worth {{ object.coin_10p.pretty_value }}<p>
+        <p>{{ object.coin_5p }} x 5p worth {{ object.coin_5p.pretty_value }}<p>
+        <p>{{ object.coin_2p }} x 2p worth {{ object.coin_2p.pretty_value }}<p>
+        <p>{{ object.coin_1p }} x 1p worth {{ object.coin_1p.pretty_value }}<p>
+        <p>Total cash: {{ object.till_total }}</p>
+
+        <h4>Reconciliation</h4>
+        <p>Float: {{ object.till_float }}</p>
+        <p>To bank: {{ object.to_bank }}</p>
+        <p>Expected: {{ object.cash_takings }}</p>
+        <p>Difference: {{ object.till_difference }}</p>
+        <a href="{% url 'cashup_closure_update' object.pk %}">Edit</a>
+    </div>
+{% endblock %}

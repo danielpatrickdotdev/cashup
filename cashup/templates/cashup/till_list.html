@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Tills{% endblock %}
+{% block body %}
+    <div>{% for till in object_list %}
+        <div><a href="{{ till.get_absolute_url }}">{{ till.name }}</a></div>
+    {% endfor %}</div>
+{% endblock %}
