@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Tills{% endblock %}
 {% block body %}{% if till %}
-    <div>
-        <p>{{ till.name }}</p>
-        <p>{{ till.location }}</p>
-    </div>{% endif %}
-    <div>{% for closure in object_list %}
-        <div><a href="{{ closure.get_absolute_url }}">{{ closure.close_time }}</a></div>
-    {% endfor %}</div>
-{% endblock %}
+        <div>
+            <p>{{ till.name }}</p>
+            <p>{{ till.location }}</p>
+        </div>{% endif %}
+        <div>{% for closure in object_list %}
+            <div><a href="{{ closure.get_absolute_url }}">{{ closure.close_time }}</a></div>{% endfor %}
+        </div>{% endblock %}
