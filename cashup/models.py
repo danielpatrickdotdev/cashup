@@ -110,7 +110,7 @@ class TillClosure(models.Model):
     till_difference = models.DecimalField(max_digits=12, decimal_places=2)
 
     # other
-    notes = models.TextField(blank=True)
+    notes = models.TextField(blank=True, help_text="Add any useful info here")
 
     def total(self):
         denominations = [self.note_50GBP, self.note_20GBP, self.note_10GBP,

@@ -32,12 +32,12 @@
                 {% endif %}
                 <div class="form-group row form-field" id="{{ field.name }}-form-field">
                     {% if forloop.counter == 1 %}
-                    {# till #}
+                    {# closed_by #}
                     <label class="col-xs-5 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-7">
-                        <input class="form-control" id="{{ field.id_for_label }}" maxlength="{{ field.field.max_length }}" name="{{ field.html_name }}" type="text" value="{{ field.value|default_if_none:"" }}" required>
+                        <input class="form-control" id="{{ field.id_for_label }}" maxlength="{{ field.field.max_length }}" name="{{ field.html_name }}" placeholder="{{ field.help_text }}" type="text" value="{{ field.value|default_if_none:"" }}" required>
                     </div>
-                    {# /till #}
+                    {# /closed_by #}
                     {% elif forloop.counter == 2 %}
                     {# close_time #}
                     <label class="col-xs-5 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -159,7 +159,7 @@
                     {# notes #}
                     <div class="col-sm-12 input-group">
                         <label class="col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        <textarea class="form-control" cols="40" id="{{ field.id_for_label }}" name="{{ field.name }}" rows="5">{% if field.value %}{{ field.value }}{% endif %}</textarea>
+                        <textarea class="form-control" cols="40" id="{{ field.id_for_label }}" placeholder="{{ field.help_text }}" name="{{ field.name }}" rows="5">{% if field.value %}{{ field.value }}{% endif %}</textarea>
                     </div>
                     {# /notes #}
                     {% endif %}

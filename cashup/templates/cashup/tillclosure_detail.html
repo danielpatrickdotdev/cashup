@@ -178,7 +178,7 @@
             <div class="card">
                 <div class="card-header">Notes</div>
                 <div class="card-block">
-                    <p class="card-text">{% if object.notes %}{{ object.notes|linebreaksbr }}{% else %}<em>No notes left.</em>{% endif %}</p>
+                    <p class="card-text">{{ object.notes|linebreaksbr|default:"No notes left." }}</p>
                 </div>
             </div>
             <div class="row">
