@@ -13,7 +13,7 @@ class TillAdmin(admin.ModelAdmin):
 admin.site.register(Till, TillAdmin)
 
 class TillClosureAdmin(admin.ModelAdmin):
-    fields = ['till', 'close_time', 'cash_takings', 'card_takings',
+    fields = ['closed_by', 'close_time', 'cash_takings', 'card_takings',
               'total_takings',
               'note_50GBP', 'note_20GBP', 'note_10GBP', 'note_5GBP',
               'coin_2GBP', 'coin_1GBP', 'coin_50p', 'coin_20p',

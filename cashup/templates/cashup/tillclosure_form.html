@@ -35,13 +35,7 @@
                     {# till #}
                     <label class="col-xs-5 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-7">
-                        <div class="input-group">
-                            <select class="form-control custom-select" id="{{ field.id_for_label }}" name="{{ field.name }}" required>
-                                {% for value, text in field.field.choices %}
-                                <option value="{{ value }}"{% if value == field.value %} selected="selected"{% endif %}>{{ text }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                        <input class="form-control" id="{{ field.id_for_label }}" maxlength="{{ field.field.max_length }}" name="{{ field.html_name }}" type="text" value="{{ field.value|default_if_none:"" }}" required>
                     </div>
                     {# /till #}
                     {% elif forloop.counter == 2 %}

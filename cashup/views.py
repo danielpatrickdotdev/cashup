@@ -30,7 +30,7 @@ class TillClosureDetailView(TillClosureUserMixin, DetailView):
 
 
 class TillClosureFormMixin(TillClosureUserMixin):
-    fields = ['till', 'close_time', 'cash_takings', 'card_takings',
+    fields = ['closed_by', 'close_time', 'cash_takings', 'card_takings',
               'note_50GBP', 'note_20GBP', 'note_10GBP', 'note_5GBP',
               'coin_2GBP', 'coin_1GBP', 'coin_50p', 'coin_20p',
               'coin_10p', 'coin_5p', 'coin_2p', 'coin_1p', 'till_float',

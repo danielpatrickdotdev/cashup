@@ -82,6 +82,7 @@ class Till(models.Model):
 
 class TillClosure(models.Model):
     till = models.ForeignKey(Till)
+    closed_by = models.CharField(max_length=20, help_text="Staff name/initials")
     close_time = models.DateTimeField(default=time)
 
     # takings
