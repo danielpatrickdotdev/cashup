@@ -5,6 +5,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.core.validators import MinValueValidator
 
 
 def time():
@@ -86,8 +87,10 @@ class TillClosure(models.Model):
     close_time = models.DateTimeField(default=time)
 
     # takings
-    cash_takings = models.DecimalField(max_digits=12, decimal_places=2)
-    card_takings = models.DecimalField(max_digits=12, decimal_places=2)
+    cash_takings = models.DecimalField(max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))])
+    card_takings = models.DecimalField(max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))])
     total_takings = models.DecimalField(max_digits=12, decimal_places=2, editable=False)
 
     # cash held
@@ -106,7 +109,8 @@ class TillClosure(models.Model):
 
     # reconciliation
     till_total = models.DecimalField(max_digits=12, decimal_places=2, editable=False)
-    till_float = models.DecimalField(max_digits=12, decimal_places=2)
+    till_float = models.DecimalField(max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))])
     till_difference = models.DecimalField(max_digits=12, decimal_places=2)
 
     # other

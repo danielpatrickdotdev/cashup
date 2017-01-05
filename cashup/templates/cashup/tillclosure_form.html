@@ -55,7 +55,7 @@
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control takings-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" type="number" value="{{ field.value }}" required />
+                            <input class="form-control takings-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" min="0.00" type="number" value="{{ field.value }}" required />
                         </div>
                     </div>
                     {# /cash_takings #}
@@ -65,7 +65,7 @@
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control takings-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" type="number" value="{{ field.value }}" required>
+                            <input class="form-control takings-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" min="0.00" type="number" value="{{ field.value }}" required>
                         </div>
                     </div>
                 {# /card_takings #}
@@ -118,7 +118,7 @@
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control float-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" type="number" value="{{ field.value }}" required>
+                            <input class="form-control float-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" min="0.00" type="number" value="{{ field.value }}" required>
                         </div>
                     </div>
                     {# /till_float #}
