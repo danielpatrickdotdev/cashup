@@ -4,7 +4,7 @@ from .models import Till, TillClosure
 
 
 class TillAdmin(admin.ModelAdmin):
-    fields = ('name', 'location')
+    fields = ('name', 'location', 'default_float')
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user

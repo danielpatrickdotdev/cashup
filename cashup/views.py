@@ -42,4 +42,7 @@ class TillClosureUpdateView(TillClosureFormMixin, UpdateView):
 
 
 class TillClosureCreateView(TillClosureFormMixin, CreateView):
-    pass
+    def get_initial(self):
+        return {
+            'till_float': self.request.user.till.default_float,
+        }

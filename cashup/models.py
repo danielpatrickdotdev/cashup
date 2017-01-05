@@ -72,6 +72,7 @@ class Till(models.Model):
         on_delete=models.CASCADE)
     location = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
+    default_float = models.DecimalField(max_digits=12, decimal_places=2)
 
     def __str__(self):
         return "{0} at {1}".format(self.name, self.location)
