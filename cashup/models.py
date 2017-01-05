@@ -68,7 +68,8 @@ class DenominationCountField(models.PositiveIntegerField):
         return field
 
 class Till(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='till',
+        on_delete=models.CASCADE)
     location = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
 
