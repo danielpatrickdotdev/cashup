@@ -8,9 +8,13 @@
         <link rel="stylesheet" href="{% static "css/font-awesome.min.css" %}">
         <title>{% block title %}Cashitup{% endblock %}</title>{% endblock %}
         <style>{% block style %}
-            body {
-                margin-top: 20px;
+            .navbar {
+                margin-bottom: 10px;
             }
+			.nav-link {
+				border-right: 20px; /* This isn't working */
+				float: right;
+			}
             /* Sticky footer styles
             -------------------------------------------------- */
             html {
@@ -35,7 +39,26 @@
             }{% endblock %}
         </style>
     </head>
-    <body>{% block body %}{% endblock %}
+    <body>
+        <nav class="navbar navbar-full navbar-dark bg-inverse">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/">Cashitup</a>
+				</div>
+				<div class="float-xs-right">
+				<button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation"></button>
+				<div class="collapse navbar-toggleable-xs" id="navbar">
+					<ul class="nav navbar-nav float-xs-right">
+						<li class="nav-item active">{% if user.is_authenticated %}
+							<a class="nav-link" href="">Logout</a>{% else %}
+							<a class="nav-link" href="">Login</a>{% endif %}
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="">Dummy</a>
+						</li>
+					</ul>
+				</div>
+				</div>
+        </nav>{% block body %}{% endblock %}
         <footer class="footer">
             <div class="container">
                 <span class="text-muted float-xs-center">&copy; Daniel Patrick 2017</span>
