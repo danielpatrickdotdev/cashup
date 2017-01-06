@@ -41,6 +41,7 @@
     </head>
     <body>
         <nav class="navbar navbar-full navbar-dark bg-inverse">
+            <div class="container" id="nav-container">
 				<div class="navbar-header">
 					<a class="navbar-brand" href="/">Cashitup</a>
 				</div>
@@ -58,9 +59,10 @@
 					</ul>
 				</div>
 				</div>
-        </nav>{% block body %}{% endblock %}
+        </nav>
+        <div class="container" id="main-body-container">{% block body %}{% endblock %}</div>
         <footer class="footer">
-            <div class="container">
+            <div class="container" id="footer-container">
                 <span class="text-muted float-xs-center">&copy; Daniel Patrick 2017</span>
             </div>
         </footer>

@@ -6,7 +6,6 @@
                 text-align: right;
             }{% endblock %}
     {% block body %}
-        <div class="container">
             <h1>Cashup Till</h1>
             <form action="" method="post" class="form-horizontal till-closure-form">
                 {% csrf_token %}
@@ -171,7 +170,6 @@
                     </div>
                 </div>
             </form>
-        </div>
         {% endblock %}
         {% block script %}{{ block.super }}
         <script src="{% static "js/cashup-form.js" %}"></script>{% endblock %}
