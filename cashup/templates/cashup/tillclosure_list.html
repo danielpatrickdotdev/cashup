@@ -3,7 +3,7 @@
 {% block body %}{% if till %}
             <p>{{ till.name }}</p>
             <p>{{ till.location }}</p>
-        </div>{% endif %}
+        {% endif %}
         <div>{% for closure in object_list %}
             <div><a href="{{ closure.get_absolute_url }}">{{ closure.close_time }}</a></div>{% endfor %}
-        {% endblock %}
+        </div>{% endblock %}
