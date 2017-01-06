@@ -11,10 +11,14 @@
             .navbar {
                 margin-bottom: 10px;
             }
-			.nav-link {
-				border-right: 20px; /* This isn't working */
-				float: right;
-			}
+            .nav-item,
+            .nav-link {
+		        float: right;
+            }
+            .navbar {
+                padding-left: 1px;
+                padding-right: 1px;
+            }
             /* Sticky footer styles
             -------------------------------------------------- */
             html {
@@ -46,7 +50,7 @@
 					<a class="navbar-brand" href="/">Cashitup</a>
 				</div>
 				<div class="float-xs-right">
-				<button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation"></button>
+				<button class="navbar-toggler hidden-sm-up float-xs-right" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation"></button>
 				<div class="collapse navbar-toggleable-xs" id="navbar">
 					<ul class="nav navbar-nav float-xs-right">
 						<li class="nav-item active">{% if user.is_authenticated %}
