@@ -4,11 +4,7 @@ from .models import Till, TillClosure
 
 
 class TillAdmin(admin.ModelAdmin):
-    fields = ('name', 'location', 'default_float')
-
-    def save_model(self, request, obj, form, change):
-        obj.user = request.user
-        super(TillAdmin, self).save_model(request, obj, form, change)
+    fields = ('user', 'name', 'location', 'default_float')
 
 admin.site.register(Till, TillAdmin)
 
