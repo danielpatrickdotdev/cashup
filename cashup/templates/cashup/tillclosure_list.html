@@ -1,7 +1,73 @@
 {% extends "base.html" %}
-{% block title %}Cashup history for {{ till }} |{{ block.super }}{% endblock %}
-{% block body %}
-            <h1>{{ till }}</h1>
-        <div>{% for closure in object_list %}
-            <div><a href="{{ closure.get_absolute_url }}">{{ closure.close_time }}</a></div>{% endfor %}
-        </div>{% endblock %}
+{% block title %}{{ outlet.name }} |{{ block.super }}{% endblock %}
+{% block style %}{{ block.super }}
+            #till-takings-list-head th,
+            #till-takings-list-head-2 th,
+            .date-time-td {
+                text-align: center;
+            }
+            #till-takings-list-head-2 > th {
+                border-bottom-width: 2px;
+            }
+            .money-td {
+                text-align: right;
+            }
+            .table-hover tbody tr:hover#till-takings-list-head-2 {
+                background-color: #fff;
+            }
+            #till-takings-list-row td {
+                width: 25%;
+                padding: 2px 0 0;
+            }
+            tbody tr:nth-of-type(even) {
+                background-color: rgba(0,0,0,.05);
+            }
+            td a {
+                display: block;
+                padding: 10px 12px 12px;
+                color: #373a3c;
+            }
+            td a:active,
+            td a:focus,
+            td a:hover {
+                outline: none;
+                text-decoration:none;
+                color: #373a3c;
+            }
+            tbody tr:hover {
+                background-color: #d9edf7;
+                opacity: 0.5;
+            }
+            tfoot td {
+                font-weight: bold;
+            }{% endblock %}
+{% block content %}
+            <h1>{{ outlet.name }}</h1>
+            <p class="head">Outlet cashing up history</p>
+            <p>Click headers to sort (TO IMPLEMENT)</p>
+            <table class="table table-bordered">
+                <thead id="till-takings-list-head" class="thead-inverse">
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Takings</th>
+                    <th>Difference</th>
+                </thead>
+                <tbody id="till-takings-list-body">
+                    {% for object in object_list %}
+                    <tr id="till-takings-list-row">
+                        <td class="date-time-td">
+                            <a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"d/m/y" }}</a></td>
+                        <td class="date-time-td"><a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"H:i" }}</td>
+                        <td class="money-td"><a href="{{ object.get_absolute_url }}">£{{ object.total_takings }}</a></td>
+                        <td class="money-td"><a href="{{ object.get_absolute_url }}">£{{ object.till_difference }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2">Totals</td>
+                        <td class="money-td">£{{ totals.total_takings|default:"0.00" }}</td>
+                        <td class="money-td">£{{ totals.till_difference|default:"0.00" }}</td>
+                    </tr>
+                </tfoot>
+            </table>{% endblock %}

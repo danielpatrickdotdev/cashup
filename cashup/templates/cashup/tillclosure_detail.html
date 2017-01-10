@@ -1,22 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Tills{% endblock %}
+{% block title %}Till close on {{ object.close_time|date:"d/m/Y" }} | {{ outlet }} | {{ block.super }}{% endblock %}
 {% block style %}{{ block.super }}
+            #till-cashup-info-head th,
             #till-contents-head th,
-            #till-contents-head-2 th {
-                text-align: center;
-            }
-            #till-contents-head-2 > th {
-                border-bottom-width: 2px;
-            }
-            #till-takings-head th:last-child {
-                text-align: center;
-            }
+            #till-contents-head-2 th,
+            #till-takings-head th:last-child,
+            .denom-td,
             .date-time-td,
             .staff-name-td {
                 text-align: center;
             }
-            .table-hover tbody tr:hover#till-contents-head-2 {
-                background-color: #fff;
+            #till-contents-head-2 > th {
+                border-bottom-width: 2px;
             }
             .money-td {
                 text-align: right;
@@ -26,30 +21,39 @@
             td.money-td {
                 width: 33%;
             }
+            #till-contents-foot tr,
+            #till-reconciliation-foot tr,
+            tbody tr:nth-of-type(even) {
+                background-color: rgba(0,0,0,.05);
+            }
             #till-cashup-info-body td {
                 width: 33%;
             }
             .table tbody > tr:last-child > td:last-child.money-td,
             .table tfoot > tr > td:last-child {
                 border-bottom: 1px solid #55595c;
+            }
+            tfoot td {
+                font-weight: bold;
             }{% endblock %}
-{% block body %}
-        <h1>Till closure record</h1>
-        <table class="table table-bordered table-hover">
-            <thead class="thead-default" id="till-cashup-info-head">
-                <th colspan="2">Closed by</th>
-                <th class="staff-name-td">{{ object.closed_by }}</th>
+{% block content %}
+        <h1>Till Closure Record</h1>
+        <p class="head">At <a href="{{ object.outlet.get_absolute_url }}">{{ object.outlet.name }}</a></p>
+        <table class="table table-bordered">
+            <thead id="till-cashup-info-head" class="thead-inverse">
+                <th>Closed by</th>
+                <th colspan="2">Closed at</td>
             </thead>
             <tbody id="till-cashup-info-body">
                 <tr>
-                    <td>Closed at</td>
-                    <td class="date-time-td">{{ object.close_time|date:"H:i" }}</td>
-                    <td class="date-time-td">{{ object.close_time|date:"d/m/Y" }}</td>
+                    <td class="staff-name-td"><span class="fa fa-user"></span> {{ object.closed_by.username }}</td>
+                    <td class="date-time-td"><span class="fa fa-clock-o"></span> {{ object.close_time|date:"H:i" }}</td>
+                    <td class="date-time-td"><span class="fa fa-calendar"></span> {{ object.close_time|date:"d/m/Y" }}</td>
                 </tr>
             </tbody>
         </table>
-        <table class="table table-bordered table-hover">
-            <thead class="thead-default" id="till-takings-head">
+        <table class="table table-bordered">
+            <thead id="till-takings-head" class="thead-inverse">
                 <th colspan="2">Takings</th>
                 <th>Value</th>
             </thead>
@@ -63,15 +67,15 @@
                     <td class="money-td">£{{ object.card_takings }}</td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot id="till-takings-foot">
                 <tr>
                     <td colspan="2" scope="row">Total</td>
                     <td class="money-td">£{{ object.total_takings }}</td>
                 </tr>
             </tfoot>
         </table>
-        <table class="table table-bordered table-hover">
-            <thead class="thead-default" id="till-contents-head">
+        <table class="table table-bordered">
+            <thead id="till-contents-head" class="thead-inverse">
                 <th colspan="3">Till contents</th>
             </thead>
             <tbody id="till-contents-body">
@@ -81,75 +85,75 @@
                     <th>Value</th>
                 </tr>
                 <tr>
-                    <td>{{ object.note_50GBP }}</td>
-                    <td>£50 notes</td>
+                    <td class="num-td">{{ object.note_50GBP }}</td>
+                    <td class="denom-td">£50 notes</td>
                     <td class="money-td">£{{ object.note_50GBP.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.note_20GBP }}</td>
-                    <td>£20 notes</td>
+                    <td class="num-td">{{ object.note_20GBP }}</td>
+                    <td class="denom-td">£20 notes</td>
                     <td class="money-td">£{{ object.note_20GBP.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.note_10GBP }}</td>
-                    <td>£10 notes</td>
+                    <td class="num-td">{{ object.note_10GBP }}</td>
+                    <td class="denom-td">£10 notes</td>
                     <td class="money-td">£{{ object.note_10GBP.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.note_5GBP }}</td>
-                    <td>£5 notes</td>
+                    <td class="num-td">{{ object.note_5GBP }}</td>
+                    <td class="denom-td">£5 notes</td>
                     <td class="money-td">£{{ object.note_5GBP.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_2GBP }}</td>
-                    <td>£2 coins</td>
+                    <td class="num-td">{{ object.coin_2GBP }}</td>
+                    <td class="denom-td">£2 coins</td>
                     <td class="money-td">£{{ object.coin_2GBP.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_1GBP }}</td>
-                    <td>£1 coins</td>
+                    <td class="num-td">{{ object.coin_1GBP }}</td>
+                    <td class="denom-td">£1 coins</td>
                     <td class="money-td">£{{ object.coin_1GBP.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_50p }}</td>
-                    <td>50p coins</td>
+                    <td class="num-td">{{ object.coin_50p }}</td>
+                    <td class="denom-td">50p coins</td>
                     <td class="money-td">£{{ object.coin_50p.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_20p }}</td>
-                    <td>20p coins</td>
+                    <td class="num-td">{{ object.coin_20p }}</td>
+                    <td class="denom-td">20p coins</td>
                     <td class="money-td">£{{ object.coin_20p.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_10p }}</td>
-                    <td>10p coins</td>
+                    <td class="num-td">{{ object.coin_10p }}</td>
+                    <td class="denom-td">10p coins</td>
                     <td class="money-td">£{{ object.coin_10p.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_5p }}</td>
-                    <td>5p coins</td>
+                    <td class="num-td">{{ object.coin_5p }}</td>
+                    <td class="denom-td">5p coins</td>
                     <td class="money-td">£{{ object.coin_5p.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_2p }}</td>
-                    <td>2p coins</td>
+                    <td class="num-td">{{ object.coin_2p }}</td>
+                    <td class="denom-td">2p coins</td>
                     <td class="money-td">£{{ object.coin_2p.pretty_value }}</td>
                 </tr>
                 <tr>
-                    <td>{{ object.coin_1p }}</td>
-                    <td>1p coins</td>
+                    <td class="num-td">{{ object.coin_1p }}</td>
+                    <td class="denom-td">1p coins</td>
                     <td class="money-td">£{{ object.coin_1p.pretty_value }}</td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot id="till-contents-foot">
                 <tr>
                     <td colspan="2">Till total</td>
                     <td class="money-td">£{{ object.till_total }}</td>
                 </tr>
             </tfoot>
         </table>
-        <table class="table table-bordered table-hover">
-            <thead class="thead-default" id="till-reconciliation-head">
+        <table class="table table-bordered">
+            <thead id="till-reconciliation-head" class="thead-inverse">
                 <th colspan="3">Reconciliation</th>
             </thead>
             <tbody id="till-reconciliation-body">
@@ -166,22 +170,27 @@
                     <td class="money-td">£{{ object.cash_takings }}</td>
                 </tr>
             </tbody>
-            <tfoot>
+            <tfoot id="till-reconciliation-foot">
                 <tr>
                     <td colspan="2" scope="row">Difference</td>
                     <td class="money-td table-{% if object.till_difference == 0 %}success{% else %}danger{% endif %}">£{{ object.till_difference }}</td>
                 </tr>
             </tfoot>
         </table>
-        <div class="card">
-            <div class="card-header">Notes</div>
-            <div class="card-block">
-                <p class="card-text">{{ object.notes|linebreaksbr|default:"No notes left." }}</p>
-            </div>
-        </div>
+        <table class="table table-bordered">
+            <thead class="thead-inverse">
+                <th>Notes</th>
+            </thead>
+            <tbody>
+                <td>{{ object.notes|linebreaksbr|default:"<em>No notes left.</em>" }}</td>
+            </tbody>
+        </table>{% load rules %}
+        {% has_perm 'cashup.change_tillclosure' user object as can_edit %}
+        {% if can_edit %}
         <div class="row">
             <div class="col-sm-4 float-sm-right">
-                <a href="{% url 'cashup_closure_update' object.pk %}" class="btn btn-primary btn-block">Edit</a>
+                <a href="{% url 'cashup_closure_update' object.outlet.name object.pk %}" class="btn btn-primary btn-block">Edit</a>
             </div>
         </div>
+        {% endif %}
 {% endblock %}

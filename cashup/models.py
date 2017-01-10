@@ -68,22 +68,74 @@ class DenominationCountField(models.PositiveIntegerField):
         field.pence_value = self.pence_value
         return field
 
-class Till(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='till',
+
+class Personnel(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='cashup',
         on_delete=models.CASCADE)
-    location = models.CharField(max_length=128)
-    name = models.CharField(max_length=128)
-    default_float = models.DecimalField(max_digits=12, decimal_places=2)
+    business = models.ForeignKey('Business', related_name='personnel',
+        on_delete=models.CASCADE)
+    is_manager = models.BooleanField(default=False)
+    is_owner = models.BooleanField(default=False)
+
+
+class Business(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='business',
+        on_delete=models.CASCADE)
+    name = models.SlugField(max_length=12)
 
     def __str__(self):
-        return "{0} at {1}".format(self.name, self.location)
+        return self.name
 
     def get_absolute_url(self):
-        return reverse('cashup_till_detail', args=[str(self.pk)])
+        return reverse('cashup_business_update')
+
+
+class Outlet(models.Model):
+    business = models.ForeignKey(Business, related_name='outlets',
+        on_delete=models.CASCADE)
+    personnel = models.ManyToManyField(Personnel, related_name='outlets',
+        through='StaffPositions')
+    old_staff = models.ManyToManyField(settings.AUTH_USER_MODEL,
+        related_name='workplaces', through='OutletStaff')
+    name = models.SlugField(max_length=24, help_text='Enter a shop name or location')
+    default_float = models.DecimalField(max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))])
+
+    def __str__(self):
+        return "{} Outlet".format(self.name)
+
+    def get_absolute_url(self):
+        return reverse('cashup_closures_for_outlet',
+            kwargs={'outlet_name':self.name})
+
+    class Meta:
+        unique_together = ('name', 'business')
+
+
+class OutletStaff(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    outlet = models.ForeignKey(Outlet, on_delete=models.CASCADE)
+    is_manager = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('outlet', 'user')
+
+
+class StaffPositions(models.Model):
+    personnel = models.ForeignKey(Personnel, related_name='positions',
+        on_delete=models.CASCADE)
+    outlet = models.ForeignKey(Outlet, related_name='staff',
+        on_delete=models.CASCADE)
+    is_manager = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('outlet', 'personnel')
+
 
 class TillClosure(models.Model):
-    till = models.ForeignKey(Till)
-    closed_by = models.CharField(max_length=20, help_text="Staff name/initials")
+    outlet = models.ForeignKey(Outlet, related_name='tillclosures')
+    closed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tillclosures',
+        on_delete=models.CASCADE)
     close_time = models.DateTimeField(default=time)
 
     # takings
@@ -134,9 +186,19 @@ class TillClosure(models.Model):
         super(TillClosure, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{0} closure at {1:%H:%M} on {1:%d/%m/%Y}'.format(
-            self.till.name, self.close_time)
+        return '{0} till closure at {1:%H:%M} on {1:%d/%m/%Y}'.format(
+            self.outlet.name, self.close_time)
 
     def get_absolute_url(self):
-        return reverse('cashup_closure_detail', args=[str(self.pk)])
+        return reverse('cashup_closure_detail',
+            args=[self.outlet.name, str(self.pk)])
 
+    class Meta:
+        get_latest_by = 'close_time'
+        ordering = ['close_time']
+
+class NotesHelpText(models.Model):
+    text = models.CharField(max_length=128, unique=True)
+
+    def __str__(self):
+        return self.text

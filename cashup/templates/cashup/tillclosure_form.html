@@ -1,70 +1,66 @@
 {% extends "base.html" %}{% load staticfiles %}
-{% block title %}Cashup till | {{ block.super }}{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit till close{% else %}Close till{% endif %} | {{ outlet.name }} | {{ block.super }}{% endblock %}
     {% block head %}{{ block.super }}{% endblock %}
         {% block style %}{{ block.super }}
             .money-input {
                 text-align: right;
             }{% endblock %}
-    {% block body %}
+    {% block content %}
             <h1>Cashup Till</h1>
-            <form action="" method="post" class="form-horizontal till-closure-form">
+        <p class="head">At <a href="{{ outlet.get_absolute_url }}">{{ outlet.name }}</a></p>
+            <form class="form-horizontal till-closure-form" action="" method="post">
                 {% csrf_token %}
-                {% if form.non_fields_errors %}
-                <div class="non-field-errors">
-                    {{ form.non_field_errors }}
-                </div>
-                {% endif %}
-                {% for field in form %}
-                {% if forloop.counter == 3 %}
-                <h4>Takings</h4>
-                {% elif forloop.counter == 5 %}
-                <h4>Till Contents</h4>
-                {% elif forloop.counter == 17 %}
-                <h4>Reconcile</h4>
-                {% endif %}
-                {% if field.errors %}
-                <div class="form-field-errors" id="{{ field.name }}-form-field-errors">
-                    {% for error in field.errors %}
-                    <div class="row form-field-error error">{{ error }}</div>
+                {% if form.non_field_errors %}
+                <div class="form-non-field-errors">
+                    {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
                     {% endfor %}
                 </div>
                 {% endif %}
-                <div class="form-group row form-field" id="{{ field.name }}-form-field">
+                {% for field in form %}
+                {% if forloop.counter == 2 %}
+                <h4>Takings</h4>
+                {% elif forloop.counter == 4 %}
+                <h4>Till Contents</h4>
+                {% elif forloop.counter == 16 %}
+                <h4>Reconcile</h4>
+                {% endif %}
+                {% if field.errors %}
+                <div id="{{ field.name }}-form-field-errors" class="form-field-errors">
+                    {% for error in field.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div id="{{ field.name }}-form-field" class="form-group row form-field">
                     {% if forloop.counter == 1 %}
-                    {# closed_by #}
-                    <label class="col-xs-5 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    <div class="col-xs-7">
-                        <input class="form-control" id="{{ field.id_for_label }}" maxlength="{{ field.field.max_length }}" name="{{ field.html_name }}" placeholder="{{ field.help_text }}" type="text" value="{{ field.value|default_if_none:"" }}" required>
-                    </div>
-                    {# /closed_by #}
-                    {% elif forloop.counter == 2 %}
                     {# close_time #}
                     <label class="col-xs-5 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-7">
                         <div class="input-group">
-                            <input class="form-control" id="{{ field.id_for_label }}" name="{{ field.name }}" type="text" value="{{ field.value|date:"Y-m-d H:i" }}" required />
+                            <input id="{{ field.id_for_label }}" class="form-control" name="{{ field.name }}" type="text" value="{{ field.value|date:"Y-m-d H:i" }}" required />
                             <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                             <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
                         </div>
                     </div>
                     {# /close_time #}
-                    {% elif forloop.counter == 3 %}
+                    {% elif forloop.counter == 2 %}
                     {# cash_takings #}
                     <label class="col-xs-7 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control takings-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" min="0.00" type="number" value="{{ field.value }}" required />
+                            <input id="{{ field.id_for_label }}" class="form-control takings-input money-input" name="{{ field.name }}" type="number" value="{{ field.value|default:"0.00" }}" step="0.01" min="0.00" required>
                         </div>
                     </div>
                     {# /cash_takings #}
-                    {% elif forloop.counter == 4 %}
+                    {% elif forloop.counter == 3 %}
                     {# card_takings #}
                     <label class="col-xs-7 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control takings-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" min="0.00" type="number" value="{{ field.value }}" required>
+                            <input id="{{ field.id_for_label }}" class="form-control takings-input money-input" name="{{ field.name }}" type="number" value="{{ field.value|default:"0.00" }}" step="0.01" min="0.00" required>
                         </div>
                     </div>
                 {# /card_takings #}
@@ -75,16 +71,16 @@
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control money-input" id="total-takings-value" type="number" value="" disabled>
+                            <input id="total-takings-value" class="form-control money-input" type="number" value="0.00" step="0.01" min="0.00" disabled>
                         </div>
                     </div>
                     {# /total_takings #}
-                    {% elif forloop.counter <= 16 %}
+                    {% elif forloop.counter <= 15 %}
                     {# till contents #}
                     <div class="col-xs-7 col-sm-7">
                         <div class="row">
                             <div class="col-xs-7 col-sm-8">
-                                <input class="form-control denom-input" id="{{ field.id_for_label }}" min="0" name="{{ field.name }}" type="number" value="{{ field.value }}" required />
+                                <input id="{{ field.id_for_label }}" class="form-control denom-input" name="{{ field.name }}" type="number" value="{{ field.value }}" min="0" required>
                             </div>
                             <div class="col-xs-5 col-sm-4 text-right float-right">
                                 <label class="col-form-label" for="{{ field.id_for_label }}">{{ field.label }} =</label>
@@ -94,71 +90,71 @@
                     <div class="col-xs-5 col-sm-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control denom-value money-input" id="{{ field.name }}-denom-value" unit_value="{{ field.field.pence_value }}" type="number" value="" disabled>
+                            <input id="{{ field.name }}-denom-value" class="form-control denom-value money-input" type="number" value="0.00" step="0.01" min="0.00" unit_value="{{ field.field.pence_value }}" disabled>
                         </div>
                     </div>
                     {# /till contents #}
                     {% endif %}
-                    {% if forloop.counter == 16 %}
+                    {% if forloop.counter == 15 %}
                 </div>
                 {# till_total #}
-                <div class="form-group row form-field dummy-form-field" id="till-total-form-field">
+                <div id="till-total-form-field" class="form-group row form-field dummy-form-field">
                     <label class="col-xs-7 col-form-label" for="id_till_total">Till total</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control money-input" id="till-total-value" type="number" value="" disabled>
+                            <input id="till-total-value" class="form-control money-input" type="number" value="0.00" step="0.01" min="0.00" disabled>
                         </div>
                     </div>
                     {# /till_total #}
-                    {% elif forloop.counter == 17 %}
+                    {% elif forloop.counter == 16 %}
                     {# till_float #}
                     <label class="col-xs-7 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control float-input money-input" id="{{ field.id_for_label }}" name="{{ field.name }}" step="0.01" min="0.00" type="number" value="{{ field.value }}" required>
+                            <input id="{{ field.id_for_label }}" class="form-control float-input money-input" name="{{ field.name }}" type="number" value="{{ field.value }}" step="0.01" min="0.00" required>
                         </div>
                     </div>
                     {# /till_float #}
                 </div>
                 {# to_bank #}
-                <div class="form-group row form-field dummy-form-field" id="till-to-bank-form-field">
+                <div id="till-to-bank-form-field" class="form-group row form-field dummy-form-field">
                     <label class="col-xs-7 col-form-label" for="id_till_to_bank">To bank</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control money-input" id="till-to-bank-value" type="number" value="" disabled>
+                            <input id="till-to-bank-value" class="form-control money-input" type="number" value="0.00" step="0.01" disabled>
                         </div>
                     </div>
                     {# /to_bank #}
                 </div>
                 {# expected #}
-                <div class="form-group row form-field dummy-form-field" id="till-expected-form-field">
+                <div id="till-expected-form-field" class="form-group row form-field dummy-form-field">
                     <label class="col-xs-7 col-form-label" for="id_expected">Expected</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control money-input" id="till-expected-value" type="number" value="" disabled>
+                            <input id="till-expected-value" class="form-control money-input" type="number" value="0.00" step="0.01" min="0.00" disabled>
                         </div>
                     </div>
                     {# /expected #}
                 </div>
                 {# difference #}
-                <div class="form-group row form-field dummy-form-field" id="till-difference-form-field">
+                <div id="till-difference-form-field" class="form-group row form-field dummy-form-field">
                     <label class="col-xs-7 col-form-label" for="id_difference">Difference</label>
                     <div class="col-xs-5">
                         <div class="input-group">
                             <span class="input-group-addon">£</span>
-                            <input class="form-control money-input" id="till-difference-value" type="number" value="" disabled>
+                            <input id="till-difference-value" class="form-control money-input" type="number" value="0.00" step="0.01" disabled>
                         </div>
                     </div>
                     {# /difference #}
-                    {% elif forloop.counter == 18 %}
-                    {# notes #}
+                    {% elif forloop.counter == 17 %}
+                    {# notes #}{% load notes_help %}{% random_help_text as help_text %}
                     <div class="col-sm-12 input-group">
                         <label class="col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        <textarea class="form-control" cols="40" id="{{ field.id_for_label }}" placeholder="{{ field.help_text }}" name="{{ field.name }}" rows="5">{% if field.value %}{{ field.value }}{% endif %}</textarea>
+                        <textarea id="{{ field.id_for_label }}" class="form-control" cols="40" name="{{ field.name }}" rows="5" placeholder="{{ help_text|default:field.help_text }}">{% if field.value %}{{ field.value }}{% endif %}</textarea>
                     </div>
                     {# /notes #}
                     {% endif %}

@@ -19,6 +19,12 @@
                 padding-left: 1px;
                 padding-right: 1px;
             }
+            .navbar-brand {
+                padding: 0.14rem 0.4rem 0.14rem 0;
+            }
+            .list-group-item-action:focus, .list-group-item-action:hover {
+                background-color: transparent;
+            }
             /* Sticky footer styles
             -------------------------------------------------- */
             html {
@@ -45,28 +51,86 @@
     </head>
     <body>
         <nav class="navbar navbar-full navbar-dark bg-inverse">
+        {% load rules %}
+        {% with request.path as this_url %}
+        {% url 'cashup_outlet_list' as outlets_url %}
+        {% url 'cashup_outlet_create' as new_outlet_url %}
+        {% url 'login' as login_url %}
+        {% url 'logout' as logout_url %}
             <div class="container" id="nav-container">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="/">Cashitup</a>
+                    <a class="navbar-brand" href="/"><span class="fa fa-home{% if this_url != home_url and this_url != '/' %} text-muted{% endif %}"></span> Cashitup</a>
                 </div>
-                <div class="float-xs-right">
-                    <button class="navbar-toggler hidden-sm-up float-xs-right" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation"></button>
-                    <div class="collapse navbar-toggleable-xs" id="navbar">
-                    <ul class="nav navbar-nav float-xs-right">
-                        <li class="nav-item active">{% if user.is_authenticated %}
-                            <a class="nav-link" href="">Logout</a>{% else %}
-                            <a class="nav-link" href="">Login</a>{% endif %}
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="">Dummy</a>
-                        </li>
-                    </ul>
+                {% if user.is_authenticated %}
+                <div class="navbar-nav"> 
+                    {% with user.workplaces.all|length as num_outlets %}
+                    {% if num_outlets == 1 %}
+                    {% with user.workplaces.get as outlet %}
+                    {% url 'cashup_closure_create' outlet.name as closure_create_url %}
+                    {% url 'cashup_closures_for_outlet' outlet.name as outlet_closure_list_url %}
+                    {% url 'cashup_outlet_settings' outlet.name as outlet_settings_url %}
+                    <a class="nav-item nav-link{% if this_url == closure_create_url %} active{% endif %}" href="{{ closure_create_url }}"><span class="fa fa-pencil"></span> Cash Up</a>
+                    <a class="nav-item nav-link{% if this_url == outlet_closure_list_url %} active{% endif %}" href="{{ outlet_closure_list_url }}"><span class="fa fa-history"></span> History</a>
+                    {% has_perm 'cashup.change_outlet' user outlet as can_change_outlet %}
+                    {% if can_change_outlet %}
+                    <a class="nav-item nav-link{% if this_url == outlet_settings_url %} active{% endif %}" href="{{ outlet_settings_url }}"><span class="fa fa-wrench"></span> Settings</a>
+                    {% endif %}
+                    {% endwith %}{# /with ... as outlet #}
+                    {% elif num_outlets > 1 %}
+                    {# more than one outlet for this user #}
+                    {# outlets menu #}
+                    <div class="nav-item dropdown">
+                        <a id="outlets-dropdown-menu-link" class="nav-link{% if outlet or this_url == outlets_url or this_url == new_outlet_url %} active{% endif %} dropdown-toggle" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-bullseye"></span> Outlets</a>
+                        <div class="dropdown-menu" aria-labelledby="outlets-dropdown-menu-link">
+                            <a class="dropdown-item{% if this_url == outlets_url %} active{% endif %}" href="{{ outlets_url }}"><span class="fa fa-globe"></span> All</a>
+                            <div class="dropdown-divider"></div>
+                            {% for outlet_ in user.workplaces.all %}
+                            <a class="dropdown-item{% if outlet == outlet_ %} active{% endif %}" href="{{ outlet_.get_absolute_url }}"><span class="fa fa-map-marker"></span> {{ outlet_.name }}</a>
+                            {% endfor %}
+                            {% has_perm 'cashup.create_outlet' user as can_create_outlet %}
+                            {% if can_create_outlet %}
+                            <div class="dropdown-divider"></div>
+                                <a class="dropdown-item{% if this_url == new_outlet_url %} active{% endif %}" href="{{ new_outlet_url }}"><span class="fa fa-plus-circle"></span> New</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {# /outlets menu #}
+                    {% if outlet %}
+                    {# outlet extra menu #}
+                    {% url 'cashup_closure_create' outlet.name as closure_create_url %}
+                    {% url 'cashup_closures_for_outlet' outlet.name as outlet_closure_list_url %}
+                    {% url 'cashup_outlet_settings' outlet.name as outlet_settings_url %}
+                    <div class="nav-item dropdown">
+                        <a id="outlet-extra-dropdown-menu-link" class="nav-link active dropdown-toggle" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-shopping-bag"></span> {{ outlet.name }}</a>
+                        <div class="dropdown-menu" aria-labelledby="outlet-extra-dropdown-menu-link">
+                            <a class="dropdown-item{% if this_url == closure_create_url %} active{% endif %}" href="{{ closure_create_url }}"><span class="fa fa-pencil"></span> Cash Up</a>
+                            <a class="dropdown-item{% if this_url == outlet_closure_list_url %} active{% endif %}" href="{{ outlet_closure_list_url }}"><span class="fa fa-history"></span> History</a>
+                            {% has_perm 'cashup.change_outlet' user outlet as can_change_outlet %}
+                            {% if can_change_outlet %}
+                            <a class="dropdown-item{% if this_url == outlet_settings_url %} active{% endif %}" href="{{ outlet_settings_url }}"><span class="fa fa-wrench"></span> Settings</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {# /outlet extra menu #}
+                    {% endif %}{# /if outlet #}
+                    {# /more than one outlet for this user #}
+                    {% endif %}{# /elif num_outlets > 1 #}
+                    {% endwith %}{# /with ... as num_outlets #}
                 </div>
+                <div class="navbar-nav float-xs-right">
+                    <a class="nav-item nav-link text-danger" href="{{ logout_url }}">Logout <span class="fa fa-sign-out"></span></a>
+                </div>
+                {% elif this_url != login_url %}
+                <div class="navbar-nav float-xs-right">
+                    <a class="nav-item nav-link text-success" href="{{ login_url }}">Login <span class="fa fa-sign-in"></span></a>
+                </div>
+                {% endif %}
             </div>
+        {% endwith %}
         </nav>
-        <div class="container" id="main-body-container">{% block body %}{% endblock %}</div>
+        <div id="main-body-container" class="container">{% block content %}{% endblock %}</div>
         <footer class="footer">
-            <div class="container" id="footer-container">
+            <div id="footer-container" class="container">
                 <span class="text-muted float-xs-center">&copy; Daniel Patrick 2017</span>
             </div>
         </footer>
