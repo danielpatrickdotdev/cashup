@@ -1,5 +1,5 @@
 {% extends "base.html" %}{% load humanize %}
-{% block title %}Outlets | {% if object_list.first %}{{ object_list.first.business }} | {% endif %}{{ block.super }}{% endblock %}
+{% block title %}Outlets | {{ block.super }}{% endblock %}
 {% block style %}{{ block.super }}{% endblock %}
 {% block content %}
             <h1>Outlets</h1>{% if not object_list %}

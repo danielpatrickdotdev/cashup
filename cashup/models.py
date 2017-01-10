@@ -3,84 +3,33 @@ from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 
+from .modelfields import DenominationCountField
 
 def time():
     return timezone.now().replace(second=0, microsecond=0)
 
-class DenominationCount(object):
-    def __init__(self, count, pence_value):
-        self.count = count
-        self.pence_value = pence_value
-
-    @property
-    def value(self):
-        return Decimal(self.count * self.pence_value * 0.01)
-
-    @property
-    def pretty_value(self):
-        return '{:04.2f}'.format(self.value)
-
-    def __str__(self):
-        return str(self.count)
-
-class DenominationCountField(models.PositiveIntegerField):
-
-    description = _("The number of notes or coins of a particular denomination")
-
-    def __init__(self, *args, **kwargs):
-        self.pence_value = kwargs.pop('pence_value', 1)
-        super(DenominationCountField, self).__init__(*args, **kwargs)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super(
-            DenominationCountField, self).deconstruct()
-        kwargs['pence_value'] = self.pence_value
-        return name, path, args, kwargs
-
-    def get_internal_type(self):
-        return 'PositiveIntegerField'
-
-    def from_db_value(self, value, expression, connection, context):
-        if value is None:
-            return value
-        return DenominationCount(value, self.pence_value)
-
-    def to_python(self, value):
-        if isinstance(value, DenominationCount):
-            return value
-
-        if value is None:
-            return value
-
-        return DenominationCount(value, self.pence_value)
-
-    def get_prep_value(self, value):
-        if isinstance(value, DenominationCount):
-            value = value.count
-        return super(DenominationCountField, self).get_prep_value(value)
-
-    def formfield(self, *args, **kwargs):
-        field = super(DenominationCountField, self).formfield(*args, **kwargs)
-        field.pence_value = self.pence_value
-        return field
-
 
 class Personnel(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='cashup',
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='profile',
         on_delete=models.CASCADE)
     business = models.ForeignKey('Business', related_name='personnel',
         on_delete=models.CASCADE)
     is_manager = models.BooleanField(default=False)
     is_owner = models.BooleanField(default=False)
 
+    @property
+    def name(self):
+        name = self.user.first_name or ''
+        if self.user.first_name:
+            name = '{} {[0]}'.format(self.user.first_name,
+                self.user.last_name or ' ').strip()
+        return name or self.user.username
+
 
 class Business(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='business',
-        on_delete=models.CASCADE)
     name = models.SlugField(max_length=12)
 
     def __str__(self):
@@ -95,8 +44,6 @@ class Outlet(models.Model):
         on_delete=models.CASCADE)
     personnel = models.ManyToManyField(Personnel, related_name='outlets',
         through='StaffPositions')
-    old_staff = models.ManyToManyField(settings.AUTH_USER_MODEL,
-        related_name='workplaces', through='OutletStaff')
     name = models.SlugField(max_length=24, help_text='Enter a shop name or location')
     default_float = models.DecimalField(max_digits=12, decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00'))])
@@ -105,20 +52,10 @@ class Outlet(models.Model):
         return "{} Outlet".format(self.name)
 
     def get_absolute_url(self):
-        return reverse('cashup_closures_for_outlet',
-            kwargs={'outlet_name':self.name})
+        return reverse('cashup_outlet_detail', kwargs={'name':self.name})
 
     class Meta:
         unique_together = ('name', 'business')
-
-
-class OutletStaff(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    outlet = models.ForeignKey(Outlet, on_delete=models.CASCADE)
-    is_manager = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ('outlet', 'user')
 
 
 class StaffPositions(models.Model):
@@ -134,7 +71,7 @@ class StaffPositions(models.Model):
 
 class TillClosure(models.Model):
     outlet = models.ForeignKey(Outlet, related_name='tillclosures')
-    closed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tillclosures',
+    closed_by = models.ForeignKey(Personnel, related_name='tillclosures',
         on_delete=models.CASCADE)
     close_time = models.DateTimeField(default=time)
 
@@ -190,8 +127,7 @@ class TillClosure(models.Model):
             self.outlet.name, self.close_time)
 
     def get_absolute_url(self):
-        return reverse('cashup_closure_detail',
-            args=[self.outlet.name, str(self.pk)])
+        return reverse('cashup_closure_detail', kwargs={'pk': str(self.pk)})
 
     class Meta:
         get_latest_by = 'close_time'

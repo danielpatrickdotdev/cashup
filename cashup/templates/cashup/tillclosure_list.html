@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ outlet.name }} |{{ block.super }}{% endblock %}
+{% block title %}{{ outlet.name }} | {{ block.super }}{% endblock %}
 {% block style %}{{ block.super }}
             #till-takings-list-head th,
             #till-takings-list-head-2 th,
@@ -44,7 +44,6 @@
 {% block content %}
             <h1>{{ outlet.name }}</h1>
             <p class="head">Outlet cashing up history</p>
-            <p>Click headers to sort (TO IMPLEMENT)</p>
             <table class="table table-bordered">
                 <thead id="till-takings-list-head" class="thead-inverse">
                     <th>Date</th>

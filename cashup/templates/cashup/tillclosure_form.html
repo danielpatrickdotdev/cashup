@@ -1,5 +1,5 @@
 {% extends "base.html" %}{% load staticfiles %}
-{% block title %}{% if form.instance.pk %}Edit till close{% else %}Close till{% endif %} | {{ outlet.name }} | {{ block.super }}{% endblock %}
+{% block title %}{% if object %}Edit till close | {{ object.outlet.name }}{% else %}Close till{% endif %} | {{ outlet.name }} | {{ block.super }}{% endblock %}
     {% block head %}{{ block.super }}{% endblock %}
         {% block style %}{{ block.super }}
             .money-input {

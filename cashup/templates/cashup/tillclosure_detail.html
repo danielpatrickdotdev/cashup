@@ -1,5 +1,5 @@
-{% extends "base.html" %}
-{% block title %}Till close on {{ object.close_time|date:"d/m/Y" }} | {{ outlet }} | {{ block.super }}{% endblock %}
+{% extends "cashup/tillclosure_base.html" %}
+{% block title %}Till close on {{ object.close_time|date:"d/m/Y" }} | {{ block.super }}{% endblock %}
 {% block style %}{{ block.super }}
             #till-cashup-info-head th,
             #till-contents-head th,
@@ -42,11 +42,11 @@
         <table class="table table-bordered">
             <thead id="till-cashup-info-head" class="thead-inverse">
                 <th>Closed by</th>
-                <th colspan="2">Closed at</td>
+                <th colspan="2">Closed at</th>
             </thead>
             <tbody id="till-cashup-info-body">
                 <tr>
-                    <td class="staff-name-td"><span class="fa fa-user"></span> {{ object.closed_by.username }}</td>
+                    <td class="staff-name-td"><span class="fa fa-user"></span> {{ object.closed_by.name }}</td>
                     <td class="date-time-td"><span class="fa fa-clock-o"></span> {{ object.close_time|date:"H:i" }}</td>
                     <td class="date-time-td"><span class="fa fa-calendar"></span> {{ object.close_time|date:"d/m/Y" }}</td>
                 </tr>
@@ -182,14 +182,16 @@
                 <th>Notes</th>
             </thead>
             <tbody>
-                <td>{{ object.notes|linebreaksbr|default:"<em>No notes left.</em>" }}</td>
+                <tr>
+                    <td>{{ object.notes|linebreaksbr|default:"<em>No notes left.</em>" }}</td>
+                </tr>
             </tbody>
         </table>{% load rules %}
         {% has_perm 'cashup.change_tillclosure' user object as can_edit %}
         {% if can_edit %}
         <div class="row">
             <div class="col-sm-4 float-sm-right">
-                <a href="{% url 'cashup_closure_update' object.outlet.name object.pk %}" class="btn btn-primary btn-block">Edit</a>
+                <a href="{% url 'cashup_closure_update' object.pk %}" class="btn btn-primary btn-block">Edit</a>
             </div>
         </div>
         {% endif %}
