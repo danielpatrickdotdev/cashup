@@ -1,11 +1,13 @@
 {% extends "cashup/tillclosure_base.html" %}
-{% block title %}Till close on {{ object.close_time|date:"d/m/Y" }} | {{ block.super }}{% endblock %}
+{% block title %}Audit Trail for till close on {{ object.close_time|date:"d/m/Y" }} | {{ block.super }}{% endblock %}
 {% block style %}{{ block.super }}
+            #till-cashup-audit-head th,
             #till-cashup-info-head th,
             #till-contents-head th,
             #till-contents-head-2 th,
             #till-takings-head th:last-child,
             .denom-td,
+            .version-num-td,
             .date-time-td,
             .staff-name-td {
                 text-align: center;
@@ -15,6 +17,9 @@
             }
             .money-td {
                 text-align: right;
+            }
+            #till-cashup-audit-body td {
+                width: 25%;
             }
             #till-contents-body td,
             #till-cashup-info-body td,
@@ -37,12 +42,28 @@
                 font-weight: bold;
             }{% endblock %}
 {% block content %}
-        <h1>Till Closure Record</h1>
+        <h1>Till Closure Audit Trail Record</h1>
         <p class="head">At <a href="{{ object.outlet.get_absolute_url }}">{{ object.outlet.name }}</a></p>
+        <p>Return to <a href="{{ object.get_audit_list_url }}">revision history</a></p>
+        <table class="table table-bordered">
+            <thead id="till-cashup-audit-head" class="thead-inverse">
+                <th>Version #</th>
+                <th colspan="2">Edited at</td>
+                <th>Edited by</th>
+            </thead>
+            <tbody id="till-cashup-audit-body">
+                <tr>
+                    <td class="version-num-td"> {{ object.version_number }}</td>
+                    <td class="date-time-td"><span class="fa fa-clock-o"></span> {{ object.version_created_time|date:"H:i" }}</td>
+                    <td class="date-time-td"><span class="fa fa-calendar"></span> {{ object.version_created_time|date:"d/m/Y" }}</td>
+                    <td class="staff-name-td"><span class="fa fa-user"></span> {{ object.updated_by.name }}</td>
+                </tr>
+            </tbody>
+        </table>
         <table class="table table-bordered">
             <thead id="till-cashup-info-head" class="thead-inverse">
                 <th>Closed by</th>
-                <th colspan="2">Closed at</th>
+                <th colspan="2">Closed at</td>
             </thead>
             <tbody id="till-cashup-info-body">
                 <tr>
@@ -182,25 +203,15 @@
                 <th>Notes</th>
             </thead>
             <tbody>
-                <tr>
-                    <td>{{ object.notes|linebreaksbr|default:"<em>No notes left.</em>" }}</td>
-                </tr>
+                <td>{{ object.notes|linebreaksbr|default:"<em>No notes left.</em>" }}</td>
             </tbody>
         </table>{% load rules %}
-        {% has_perm 'cashup.view_tillclosure_audit_trail' user object as can_audit %}
         {% has_perm 'cashup.change_tillclosure' user object as can_edit %}
-        {% if can_audit or can_edit %}
-        <div class="row btn-block-row">
-            {% if can_audit %}
-            <div class="col-sm-4 float-sm-left">
-                <a href="{% url 'cashup_closure_audit_trail_list' object.pk %}" class="btn btn-primary btn-block">Audit Trail</a>
-            </div>
-            {% endif %}
-            {% if can_edit %}
+        {% if can_edit %}
+        <div class="row">
             <div class="col-sm-4 float-sm-right">
-                <a href="{% url 'cashup_closure_update' object.pk %}" class="btn btn-primary btn-block">Edit</a>
+                <a href="{% url 'cashup_closure_update' object.identity %}" class="btn btn-primary btn-block">New Revision</a>
             </div>
-            {% endif %}
         </div>
         {% endif %}
 {% endblock %}

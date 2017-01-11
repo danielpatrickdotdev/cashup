@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -69,6 +69,12 @@ class StaffPositions(models.Model):
         unique_together = ('outlet', 'personnel')
 
 
+class AuditTrailManager(models.Manager):
+    def get_queryset(self):
+        return super(AuditTrailManager, self).get_queryset().filter(
+            version_superseded_time=None)
+
+
 class TillClosure(models.Model):
     outlet = models.ForeignKey(Outlet, related_name='tillclosures')
     closed_by = models.ForeignKey(Personnel, related_name='tillclosures',
@@ -105,6 +111,18 @@ class TillClosure(models.Model):
     # other
     notes = models.TextField(blank=True, help_text="Add any useful info here")
 
+    # versioning
+    identity = models.PositiveIntegerField(editable=False, blank=True)
+    version_number = models.PositiveIntegerField(editable=False, blank=True)
+    object_created_time = models.DateTimeField(editable=False, blank=True)
+    version_created_time = models.DateTimeField(editable=False, blank=True)
+    version_superseded_time = models.DateTimeField(editable=False, blank=True, null=True)
+    updated_by = models.ForeignKey(Personnel, null=True, editable=False, blank=True,
+        related_name='updated_tillclosures', on_delete=models.PROTECT)
+
+    objects = AuditTrailManager()
+    audit_trail = models.Manager()
+
     def total(self):
         denominations = [self.note_50GBP, self.note_20GBP, self.note_10GBP,
                          self.note_5GBP, self.coin_2GBP, self.coin_1GBP,
@@ -116,7 +134,19 @@ class TillClosure(models.Model):
     def to_bank(self):
         return self.till_total - self.till_float
 
-    def save(self, *args, **kwargs):
+    @transaction.atomic
+    def save(self, duplicate=True, *args, **kwargs):
+        if self.pk and duplicate:
+            time = timezone.now()
+
+            tc = TillClosure.objects.get(pk=self.pk)
+            tc.pk = None
+            tc.version_superseded_time = time
+            tc.save(duplicate=False)
+
+            self.version_number = self.version_number + 1
+            self.version_created_time = time
+
         self.total_takings = self.cash_takings + self.card_takings
         self.till_total = self.total()
         self.till_difference = self.till_total - self.cash_takings - self.till_float
@@ -127,11 +157,20 @@ class TillClosure(models.Model):
             self.outlet.name, self.close_time)
 
     def get_absolute_url(self):
-        return reverse('cashup_closure_detail', kwargs={'pk': str(self.pk)})
+        return reverse('cashup_closure_detail',
+            kwargs={'pk': str(self.identity)})
+
+    def get_audit_list_url(self):
+        return reverse('cashup_closure_audit_trail_list',
+            kwargs={'pk': str(self.identity)})
+
+    def get_audit_url(self):
+        return reverse('cashup_closure_audit_trail_detail', kwargs={
+            'pk': str(self.identity), 'version': str(self.version_number)})
 
     class Meta:
         get_latest_by = 'close_time'
-        ordering = ['close_time']
+        ordering = ['close_time', 'version_number']
 
 class NotesHelpText(models.Model):
     text = models.CharField(max_length=128, unique=True)

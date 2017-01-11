@@ -26,4 +26,10 @@ urlpatterns = [
     url(r'^outlets/(?P<name>[\w.@+-]+)/close-till/$',
         views.TillClosureCreateView.as_view(),
         name='cashup_closure_create'),
+    url(r'^closures/(?P<pk>[0-9]+)/audit-trail/$',
+        views.TillClosureAuditTrailListView.as_view(),
+        name='cashup_closure_audit_trail_list'),
+    url(r'^closures/(?P<pk>[0-9]+)/audit-trail/(?P<version>[0-9]+)/$',
+        views.TillClosureAuditTrailDetailView.as_view(),
+        name='cashup_closure_audit_trail_detail'),
 ]

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Audit Trail | {{ object.outlet.name }} |{{ block.super }}{% endblock %}
+{% block style %}{{ block.super }}
+            #till-takings-list-head th,
+            #till-takings-list-head-2 th,
+            td {
+                text-align: center;
+            }
+            #till-takings-list-head-2 > th {
+                border-bottom-width: 2px;
+            }
+            .money-td {
+                text-align: right;
+            }
+            .table-hover tbody tr:hover#till-takings-list-head-2 {
+                background-color: #fff;
+            }
+            #till-takings-list-row td {
+                width: 25%;
+                padding: 2px 0 0;
+            }
+            tbody tr:nth-of-type(even) {
+                background-color: rgba(0,0,0,.05);
+            }
+            td a {
+                display: block;
+                padding: 10px 12px 12px;
+                color: #373a3c;
+            }
+            td a:active,
+            td a:focus,
+            td a:hover {
+                outline: none;
+                text-decoration:none;
+                color: #373a3c;
+            }
+            tbody tr:hover {
+                background-color: #d9edf7;
+                opacity: 0.5;
+            }
+            tfoot td {
+                font-weight: bold;
+            }{% endblock %}
+{% block content %}
+            <h1>Audit Trail</h1>
+            <p class="head">Edit history for till closure at {{ object.outlet.name }}</p>
+            <table class="table table-bordered">
+                <thead id="till-takings-list-head" class="thead-inverse">
+                    <th>Version #</th>
+                    <th colspan="2">Edited at</th>
+                    <th>Edited by</th>
+                </thead>
+                <tbody id="till-takings-list-body">
+                    {% for object in object_list %}
+                    <tr id="till-takings-list-row">
+                        <td class="version-num-td"><a href="{{ object.get_audit_url }}">{{ object.version_number }}</a></td>
+                        <td class="date-time-td"><a href="{{ object.get_audit_url }}">{{ object.version_created_time|date:"d/m/y" }}</a></td>
+                        <td class="date-time-td"><a href="{{ object.get_audit_url }}">{{ object.version_created_time|date:"H:i" }}</td>
+                        <td><a href="{{ object.get_audit_url }}"><span class="fa fa-user"></span> {{ object.updated_by.name }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>{% endblock %}

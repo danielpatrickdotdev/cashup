@@ -119,6 +119,23 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin, DetailV
         return context
 
 
+class TillClosureAuditTrailListView(LoginRequiredMixin, PermissionRequiredMixin,
+                                                                DetailView):
+    template_name = 'cashup/tillclosure_audit_trail_list.html'
+    permission_required = 'cashup.view_tillclosure_audit_trail'
+    model = TillClosure
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TillClosureAuditTrailListView, self).get_context_data(
+            *args, **kwargs)
+        tillclosure = context['object']
+        context['outlet'] = tillclosure.outlet
+        pk = tillclosure.pk
+        audit_trail = TillClosure.audit_trail.filter(identity=pk)
+        context['object_list'] = audit_trail
+        return context
+
+
 class TillClosureDetailView(LoginRequiredMixin, PermissionRequiredMixin,
                                                                 DetailView):
     permission_required = 'cashup.view_tillclosure'
@@ -126,6 +143,25 @@ class TillClosureDetailView(LoginRequiredMixin, PermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super(TillClosureDetailView, self).get_context_data(
+            *args, **kwargs)
+        context['outlet'] = context['object'].outlet
+        return context
+
+
+class TillClosureAuditTrailDetailView(LoginRequiredMixin,
+                                        PermissionRequiredMixin, DetailView):
+    permission_required = 'cashup.view_tillclosure_audit_trail'
+    template_name = 'cashup/tillclosure_audit_trail_detail.html'
+    context_object_name = 'object'
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        version = self.kwargs.get('version')
+        return get_object_or_404(TillClosure.audit_trail, identity=pk,
+            version_number=version)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TillClosureAuditTrailDetailView, self).get_context_data(
             *args, **kwargs)
         context['outlet'] = context['object'].outlet
         return context
@@ -149,6 +185,10 @@ class TillClosureUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
             *args, **kwargs)
         context['outlet'] = context['object'].outlet
         return context
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user.profile
+        return super(TillClosureUpdateView, self).form_valid(form)
 
 
 class TillClosureCreateView(LoginRequiredMixin, TillClosureFormMixin, CreateView):
@@ -181,6 +221,7 @@ class TillClosureCreateView(LoginRequiredMixin, TillClosureFormMixin, CreateView
         outlet = self.get_outlet()
         form.instance.outlet = outlet
         form.instance.closed_by = self.request.user.profile
+        form.instance.updated_by = self.request.user.profile
         return super(TillClosureCreateView, self).form_valid(form)
 
     def get_initial(self):

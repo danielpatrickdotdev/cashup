@@ -73,3 +73,6 @@ rules.add_rule('cashup.change_tillclosure',
 
 rules.add_perm('cashup.change_tillclosure',
     is_staff_and_is_editable | is_tillclosure_outlet_owner)
+
+rules.add_perm('cashup.view_tillclosure_audit_trail',
+    is_tillclosure_outlet_manager | is_tillclosure_outlet_owner)
