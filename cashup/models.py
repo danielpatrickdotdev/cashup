@@ -134,6 +134,11 @@ class TillClosure(models.Model):
     def to_bank(self):
         return self.till_total - self.till_float
 
+    @property
+    def is_deleted(self):
+        return not TillClosure.objects.filter(
+            pk=self.identity, version_superseded_time=None).exists()
+
     @transaction.atomic
     def save(self, duplicate=True, *args, **kwargs):
         if self.pk and duplicate:
