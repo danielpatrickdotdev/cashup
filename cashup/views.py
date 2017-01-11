@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (ListView, DetailView, CreateView, UpdateView,
                                   RedirectView)
+from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
@@ -98,22 +99,30 @@ class OutletTillClosureMixin(object):
 
 
 
-class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
+                                                SingleObjectMixin, ListView):
     template_name = 'cashup/tillclosure_list.html'
     context_object_name = 'outlet'
     permission_required = ['cashup.view_outlet', 'cashup.view_tillclosures_for_outlet']
     slug_url_kwarg = 'name'
     slug_field = 'name'
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(OutletClosureListView, self).get(request, *args, **kwargs)
+
+    def get_object(self, *args, **kwargs):
+        return super(OutletClosureListView, self).get_object(
+            queryset=self.request.user.profile.outlets.all(), *args, **kwargs)
+
     def get_queryset(self):
-        return self.request.user.profile.outlets.all()
+        self.queryset = self.object.tillclosures.all()
+        return self.queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super(OutletClosureListView, self).get_context_data(
             *args, **kwargs)
-        tillclosures = context['outlet'].tillclosures.all()
-        context['object_list'] = tillclosures
-        context['totals'] = tillclosures.aggregate(
+        context['totals'] = self.queryset.aggregate(
             total_takings=Sum('total_takings'),
             till_difference=Sum('till_difference'))
         return context
