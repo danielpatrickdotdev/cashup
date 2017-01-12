@@ -65,9 +65,15 @@
                     <tr id="till-takings-list-row"{% if object.is_deleted %} class="bg-danger"{% endif %}>
                         <td class="date-time-td">
                             <a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"d/m/y" }}</a></td>
-                        <td class="date-time-td"><a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"H:i" }}</td>
-                        <td class="money-td"><a href="{{ object.get_absolute_url }}">£{{ object.total_takings }}</a></td>
-                        <td class="money-td"><a href="{{ object.get_absolute_url }}">£{{ object.till_difference }}</a></td>
+                        <td class="date-time-td">
+                            <a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"H:i" }}</a>
+                        </td>
+                        <td class="money-td">
+                            <a href="{{ object.get_absolute_url }}">£{{ object.total_takings }}</a>
+                        </td>
+                        <td class="money-td">
+                            <a href="{{ object.get_absolute_url }}">£{{ object.till_difference }}</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
