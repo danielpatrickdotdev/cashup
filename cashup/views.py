@@ -106,7 +106,12 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
     permission_required = ['cashup.view_outlet', 'cashup.view_tillclosures_for_outlet']
     slug_url_kwarg = 'name'
     slug_field = 'name'
-    paginate_by = 25
+    order_dict = {'date': 'close_time',
+                  '-date': '-close_time',
+                  'takings': 'total_takings',
+                  '-takings': '-total_takings',
+                  'difference': 'till_difference',
+                  '-difference': '-till_difference'}
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -122,16 +127,22 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
 
     def get_queryset(self):
         show_deleted = self.request.GET.get('showdeleted', 0) == '1'
+        order_by = self.request.GET.get('order-by', None)
         if show_deleted and self.has_audit_perms():
             self.queryset = TillClosure.audit_trail.filter(
                 pk=F('identity'), outlet=self.object)
         else:
             self.queryset = self.object.tillclosures.all()
+        if order_by in self.order_dict:
+            self.order_by = order_by
+            self.queryset = self.queryset.order_by(self.order_dict[order_by])
         return self.queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super(OutletClosureListView, self).get_context_data(
             *args, **kwargs)
+        if hasattr(self, 'order_by'):
+            context['order_by'] = self.order_by
         context['totals'] = self.queryset.aggregate(
             total_takings=Sum('total_takings'),
             till_difference=Sum('till_difference'))

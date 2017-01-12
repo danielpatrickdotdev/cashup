@@ -38,6 +38,24 @@
                 background-color: #d9edf7;
                 opacity: 0.5;
             }
+            #till-takings-list-head th {
+                padding: 0;
+            }
+            #till-takings-list-head th a {
+                display: block;
+                padding: .75rem .25rem;
+                color: #fff;
+            }
+            th a:active,
+            th a:focus,
+            th a:hover {
+                outline: none;
+                text-decoration:none;
+                color: #fff;
+            }
+            thead th:hover {
+                background-color: rgba(0,0,0,.95);
+            }
             tfoot td {
                 font-weight: bold;
             }{% endblock %}
@@ -56,10 +74,9 @@
             <table class="table table-bordered">
                 <thead id="till-takings-list-head" class="thead-inverse">
                     <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Takings</th>
-                        <th>Difference</th>
+                        <th colspan="2"><a class="sort-link" href="?order-by={% if order_by and order_by != '-date' %}-date{% else %}date{% endif %}">Date<span class="fa-stack"><span class="fa fa-sort-asc {% if order_by and order_by != '-date' %}text-muted{% endif %} fa-stack-1x"></span><span class="fa fa-sort-desc {% if order_by != 'date' %}text-muted{% endif %} fa-stack-1x"></span></span></a></th>
+                        <th><a class="sort-link" href="?order-by={% if order_by and order_by == '-takings' %}takings{% else %}-takings{% endif %}">Takings<span class="fa-stack"><span class="fa fa-sort-asc {% if order_by != '-takings' %}text-muted{% endif %} fa-stack-1x"></span><span class="fa fa-sort-desc {% if order_by != 'takings' %}text-muted{% endif %} fa-stack-1x"></span></span></a></th>
+                        <th id="difference-head"><a class="sort-link" href="?order-by={% if order_by and order_by == '-difference' %}difference{% else %}-difference{% endif %}">Difference<span class="fa-stack"><span class="fa fa-sort-asc {% if order_by != '-difference' %}text-muted{% endif %} fa-stack-1x"></span><span class="fa fa-sort-desc {% if order_by != 'difference' %}text-muted{% endif %} fa-stack-1x"></span></span></a></th>
                     </tr>
                 </thead>
                 <tbody id="till-takings-list-body">
@@ -91,7 +108,7 @@
                 <ul class="pagination">
                     {% with page_obj.number|add:"5" as max_page %}
                     {% with page_obj.number|add:"-5" as min_page %}
-                    <li class="page-item{% if page_obj.number == 1 %} disabled{% endif %}">
+                    <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
                         <a id="pagination-first" class="page-link" href="?page=1"><span class="fa fa-angle-double-left"></span></a>
                     </li>
                     <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
@@ -107,7 +124,7 @@
                     <li class="page-item{% if not page_obj.has_next%} disabled{% endif %}">
                         <a id="pagination-next" class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% endif %}"><span class="fa fa-angle-right"></span></a>
                     </li>
-                    <li class="page-item{% if page_obj.number == paginator.num_pages %} disabled{% endif %}">
+                    <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
                         <a id="pagination-first" class="page-link" href="?page={{ paginator.num_pages }}"><span class="fa fa-angle-double-right"></span></a>
                     </li>
                     {% endwith %}
@@ -117,6 +134,13 @@
             {% endblock %}{% block script %}{{ block.super }}
             <script>
             $(document).ready(function() {
+                var setOrderByParam = function(orderBy) {
+                    return function() {
+                        const url = new URL($(this).prop("href"));
+                        url.searchParams.set("order-by", orderBy);
+                        $(this).prop("href", url.toString());
+                    };
+                }
                 var setShowDeletedParam = function() {
                     const url = new URL($(this).prop("href"));
                     url.searchParams.set("showdeleted", 1);
@@ -126,6 +150,11 @@
                 if (params.get('showdeleted') === "1") {
                     $("input#showdeleted").prop("checked", true);
                     $("a.page-link").each(setShowDeletedParam);
+                    $("a.sort-link").each(setShowDeletedParam);
+                }
+                if (params.has('order-by')) {
+                    var orderBy = params.get('order-by');
+                    $("a.page-link").each(setOrderByParam(orderBy));
                 }
                 $("input:checkbox#showdeleted").change(function() {
                     const url = new URL(location);

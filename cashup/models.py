@@ -192,7 +192,7 @@ class TillClosure(models.Model):
 
     class Meta:
         get_latest_by = 'close_time'
-        ordering = ['close_time', 'version_number']
+        ordering = ['-close_time', 'version_number']
 
 class NotesHelpText(models.Model):
     text = models.CharField(max_length=128, unique=True)
