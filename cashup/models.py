@@ -28,6 +28,13 @@ class Personnel(models.Model):
                 self.user.last_name or ' ').strip()
         return name or self.user.username
 
+    @transaction.atomic
+    def save(self):
+        if self.is_owner and  Personnel.objects.filter(
+                        self.business, is_owner=True).exists():
+            self.is_owner = False
+        super(Personnel, self).save(*args, **kwargs)
+
 
 class Business(models.Model):
     name = models.SlugField(max_length=12)
