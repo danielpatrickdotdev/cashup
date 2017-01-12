@@ -55,10 +55,12 @@
             {% endif %}
             <table class="table table-bordered">
                 <thead id="till-takings-list-head" class="thead-inverse">
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Takings</th>
-                    <th>Difference</th>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Takings</th>
+                        <th>Difference</th>
+                    </tr>
                 </thead>
                 <tbody id="till-takings-list-body">
                     {% for object in object_list %}

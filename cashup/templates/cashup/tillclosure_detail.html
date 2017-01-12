@@ -3,15 +3,11 @@
 {% block style %}{{ block.super }}
             #till-cashup-info-head th,
             #till-contents-head th,
-            #till-contents-head-2 th,
             #till-takings-head th:last-child,
             .denom-td,
             .date-time-td,
             .staff-name-td {
                 text-align: center;
-            }
-            #till-contents-head-2 > th {
-                border-bottom-width: 2px;
             }
             .money-td {
                 text-align: right;
@@ -21,7 +17,6 @@
             td.money-td {
                 width: 33%;
             }{% if object.is_deleted %}
-            #till-contents-foot tr,
             #till-reconciliation-foot tr,
             tbody tr:nth-of-type(even) {
                 background-color: #f2dede;
@@ -30,7 +25,6 @@
                 color: #fff;
                 background-color: #d9534f;
             }{% else %}
-            #till-contents-foot tr,
             #till-reconciliation-foot tr,
             tbody tr:nth-of-type(even) {
                 background-color: rgba(0,0,0,.05);
@@ -50,8 +44,10 @@
         <p class="head">At <a href="{{ object.outlet.get_absolute_url }}">{{ object.outlet.name }}</a></p>
         <table class="table table-bordered">
             <thead id="till-cashup-info-head" class="thead-inverse">
-                <th>Closed by</th>
-                <th colspan="2">Closed at</th>
+                <tr>
+                    <th>Closed by</th>
+                    <th colspan="2">Closed at</th>
+                </tr>
             </thead>
             <tbody id="till-cashup-info-body">
                 <tr>
@@ -63,8 +59,10 @@
         </table>
         <table class="table table-bordered">
             <thead id="till-takings-head" class="thead-inverse">
-                <th colspan="2">Takings</th>
-                <th>Value</th>
+                <tr>
+                    <th colspan="2">Takings</th>
+                    <th>Value</th>
+                </tr>
             </thead>
             <tbody id="till-takings-body">
                 <tr>
@@ -85,14 +83,16 @@
         </table>
         <table class="table table-bordered">
             <thead id="till-contents-head" class="thead-inverse">
-                <th colspan="3">Till contents</th>
-            </thead>
-            <tbody id="till-contents-body">
-                <tr id="till-contents-head-2">
+                <tr>
+                    <th colspan="3">Till contents</th>
+                </tr>
+                <tr>
                     <th>Count</th>
                     <th>Notes/Coins</th>
                     <th>Value</th>
                 </tr>
+            </thead>
+            <tbody id="till-contents-body">
                 <tr>
                     <td class="num-td">{{ object.note_50GBP }}</td>
                     <td class="denom-td">£50 notes</td>
@@ -163,7 +163,9 @@
         </table>
         <table class="table table-bordered">
             <thead id="till-reconciliation-head" class="thead-inverse">
-                <th colspan="3">Reconciliation</th>
+                <tr>
+                    <th colspan="3">Reconciliation</th>
+                </tr>
             </thead>
             <tbody id="till-reconciliation-body">
                 <tr>
@@ -188,7 +190,9 @@
         </table>
         <table class="table table-bordered">
             <thead class="thead-inverse">
-                <th>Notes</th>
+                <tr>
+                    <th>Notes</th>
+                </tr>
             </thead>
             <tbody>
                 <tr>
