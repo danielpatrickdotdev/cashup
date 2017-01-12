@@ -148,21 +148,31 @@ class TillClosure(models.Model):
 
     @transaction.atomic
     def save(self, duplicate=True, *args, **kwargs):
-        if self.pk and duplicate:
+        new_obj = False
+        if duplicate:
             time = timezone.now()
+            if not self.pk:
+                new_obj = True
+                self.identity = 0 # dummy value - will be fixed later
+                self.version_number = 1
+                self.object_created_time = time
+                self.version_created_time = time
+            else:
+                tc = TillClosure.objects.get(pk=self.pk)
+                tc.pk = None
+                tc.version_superseded_time = time
+                tc.save(duplicate=False)
 
-            tc = TillClosure.objects.get(pk=self.pk)
-            tc.pk = None
-            tc.version_superseded_time = time
-            tc.save(duplicate=False)
+                self.version_number = self.version_number + 1
+                self.version_created_time = time
 
-            self.version_number = self.version_number + 1
-            self.version_created_time = time
-
-        self.total_takings = self.cash_takings + self.card_takings
-        self.till_total = self.total()
-        self.till_difference = self.till_total - self.cash_takings - self.till_float
+            self.total_takings = self.cash_takings + self.card_takings
+            self.till_total = self.total()
+            self.till_difference = self.till_total - self.cash_takings - self.till_float
         super(TillClosure, self).save(*args, **kwargs)
+        if new_obj:
+            self.identity = self.pk
+            self.save(duplicate=False)
 
     def __str__(self):
         return '{0} till closure at {1:%H:%M} on {1:%d/%m/%Y}'.format(
