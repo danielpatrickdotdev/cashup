@@ -20,12 +20,21 @@
             #till-cashup-info-body td,
             td.money-td {
                 width: 33%;
+            }{% if object.is_deleted %}
+            #till-contents-foot tr,
+            #till-reconciliation-foot tr,
+            tbody tr:nth-of-type(even) {
+                background-color: #f2dede;
             }
+            .thead-inverse th {
+                color: #fff;
+                background-color: #d9534f;
+            }{% else %}
             #till-contents-foot tr,
             #till-reconciliation-foot tr,
             tbody tr:nth-of-type(even) {
                 background-color: rgba(0,0,0,.05);
-            }
+            }{% endif %}
             #till-cashup-info-body td {
                 width: 33%;
             }
@@ -37,7 +46,7 @@
                 font-weight: bold;
             }{% endblock %}
 {% block content %}
-        <h1>Till Closure Record</h1>
+<h1>{% if object.is_deleted %}Deleted Till Closure{% else %}Till Closure Detail{% endif %}</h1>
         <p class="head">At <a href="{{ object.outlet.get_absolute_url }}">{{ object.outlet.name }}</a></p>
         <table class="table table-bordered">
             <thead id="till-cashup-info-head" class="thead-inverse">

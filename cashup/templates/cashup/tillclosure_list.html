@@ -41,9 +41,18 @@
             tfoot td {
                 font-weight: bold;
             }{% endblock %}
-{% block content %}
+            {% block content %}{% load rules %}
             <h1>{{ outlet.name }}</h1>
             <p class="head">Outlet cashing up history</p>
+            {% has_perm 'cashup.view_outlet_tillclosure_audit_trail' user outlet as can_audit %}
+            {% if can_audit %}
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input id="showdeleted" class="form-check-input" type="checkbox" value="showdeleted">
+                    Show deleted
+                </label>
+            </div>
+            {% endif %}
             <table class="table table-bordered">
                 <thead id="till-takings-list-head" class="thead-inverse">
                     <th>Date</th>
@@ -53,7 +62,7 @@
                 </thead>
                 <tbody id="till-takings-list-body">
                     {% for object in object_list %}
-                    <tr id="till-takings-list-row">
+                    <tr id="till-takings-list-row"{% if object.is_deleted %} class="bg-danger"{% endif %}>
                         <td class="date-time-td">
                             <a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"d/m/y" }}</a></td>
                         <td class="date-time-td"><a href="{{ object.get_absolute_url }}">{{ object.close_time|date:"H:i" }}</td>
@@ -69,4 +78,27 @@
                         <td class="money-td">£{{ totals.till_difference|default:"0.00" }}</td>
                     </tr>
                 </tfoot>
-            </table>{% endblock %}
+            </table>{% endblock %}{% block script %}{{ block.super }}
+            <script>
+            $(document).ready(function() {
+                const params = new URLSearchParams(location.search);
+                if (params.get('showdeleted') === "1") {
+                    $("input#showdeleted").prop("checked", true);
+                }
+                $("input:checkbox#showdeleted").change(function() {
+                    var url = new URL(location);
+                    const params = new URLSearchParams(url.search);
+                    if ($(this).prop("checked")) {
+                        params.set('showdeleted', 1);
+                    } else {
+                        params.delete('showdeleted');
+                    }
+                    var url = location.protocol + '//' + location.host + location.pathname;
+                    var param_str = params.toString();
+                    if (param_str) {
+                        url += '?' + param_str;
+                    }
+                    window.location.href = url;
+                });
+            });
+            </script>{% endblock %}

@@ -33,6 +33,8 @@ def is_outlet_staff(user, outlet):
 rules.add_perm('cashup.change_outlet', is_outlet_owner | is_outlet_manager)
 rules.add_perm('cashup.view_outlet', is_outlet_owner | is_outlet_staff)
 rules.add_perm('cashup.create_outlet', is_a_business_owner)
+rules.add_perm('cashup.view_outlet_tillclosure_audit_trail',
+    is_outlet_manager | is_outlet_owner)
 
 # TillClosure rules
 
@@ -43,6 +45,10 @@ def was_closed_by(user, tillcashup):
 @rules.predicate
 def is_editable(user, tillcashup):
     return in_editable_period(tillcashup.close_time)
+
+@rules.predicate
+def is_not_deleted(user, tillcashup):
+    return not tillcashup.is_deleted
 
 @rules.predicate
 def is_tillclosure_outlet_owner(user, tillcashup):
@@ -56,7 +62,9 @@ def is_tillclosure_outlet_manager(user, tillcashup):
 def is_tillclosure_outlet_staff(user, tillcashup):
     return is_outlet_staff(user, tillcashup.outlet)
 
-is_staff_and_is_editable = is_tillclosure_outlet_staff & is_editable
+is_staff_and_is_editable = is_tillclosure_outlet_staff & is_editable & \
+    is_not_deleted
+is_staff_and_is_not_deleted = is_tillclosure_outlet_staff & is_not_deleted
 
 rules.add_perm('cashup.view_tillclosures_for_outlet',
     is_outlet_staff | is_outlet_owner)
@@ -65,7 +73,8 @@ rules.add_perm('cashup.create_tillclosure_for_outlet',
     is_outlet_staff | is_outlet_owner)
 
 rules.add_perm('cashup.view_tillclosure',
-    is_tillclosure_outlet_staff | is_tillclosure_outlet_owner)
+    is_staff_and_is_not_deleted | is_tillclosure_outlet_manager | \
+        is_tillclosure_outlet_owner)
 
 # TODO: do I need this??
 rules.add_rule('cashup.change_tillclosure',

@@ -6,7 +6,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
-from django.db.models import Sum
+from django.db.models import Sum, F
 
 import rules
 from rules.contrib.views import PermissionRequiredMixin
@@ -115,8 +115,17 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
         return super(OutletClosureListView, self).get_object(
             queryset=self.request.user.profile.outlets.all(), *args, **kwargs)
 
+    def has_audit_perms(self):
+        return self.request.user.has_perm(
+            'cashup.view_outlet_tillclosure_audit_trail', self.object)
+
     def get_queryset(self):
-        self.queryset = self.object.tillclosures.all()
+        show_deleted = self.request.GET.get('showdeleted', 0) == '1'
+        if show_deleted and self.has_audit_perms():
+            self.queryset = TillClosure.audit_trail.filter(
+                pk=F('identity'), outlet=self.object)
+        else:
+            self.queryset = self.object.tillclosures.all()
         return self.queryset
 
     def get_context_data(self, *args, **kwargs):
@@ -148,7 +157,7 @@ class TillClosureAuditTrailListView(LoginRequiredMixin, PermissionRequiredMixin,
 class TillClosureDetailView(LoginRequiredMixin, PermissionRequiredMixin,
                                                                 DetailView):
     permission_required = 'cashup.view_tillclosure'
-    model = TillClosure
+    queryset = TillClosure.audit_trail.filter(pk=F('identity'))
 
     def get_context_data(self, *args, **kwargs):
         context = super(TillClosureDetailView, self).get_context_data(
