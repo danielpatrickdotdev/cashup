@@ -106,6 +106,7 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
     permission_required = ['cashup.view_outlet', 'cashup.view_tillclosures_for_outlet']
     slug_url_kwarg = 'name'
     slug_field = 'name'
+    paginate_by = 25
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
