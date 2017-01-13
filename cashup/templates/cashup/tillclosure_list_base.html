@@ -63,9 +63,33 @@
             <table class="table table-bordered">
                 <thead id="till-takings-list-head" class="thead-inverse">
                     <tr>
-                        <th colspan="2"><a class="sort-link" href="?order-by={% if order_by and order_by != '-date' %}-date{% else %}date{% endif %}">Date<span class="fa-stack"><span class="fa fa-sort-asc {% if order_by and order_by != '-date' %}text-muted{% endif %} fa-stack-1x"></span><span class="fa fa-sort-desc {% if order_by != 'date' %}text-muted{% endif %} fa-stack-1x"></span></span></a></th>
-                        <th><a class="sort-link" href="?order-by={% if order_by and order_by == '-takings' %}takings{% else %}-takings{% endif %}">Takings<span class="fa-stack"><span class="fa fa-sort-asc {% if order_by != '-takings' %}text-muted{% endif %} fa-stack-1x"></span><span class="fa fa-sort-desc {% if order_by != 'takings' %}text-muted{% endif %} fa-stack-1x"></span></span></a></th>
-                        <th id="difference-head"><a class="sort-link" href="?order-by={% if order_by and order_by == '-difference' %}difference{% else %}-difference{% endif %}">Difference<span class="fa-stack"><span class="fa fa-sort-asc {% if order_by != '-difference' %}text-muted{% endif %} fa-stack-1x"></span><span class="fa fa-sort-desc {% if order_by != 'difference' %}text-muted{% endif %} fa-stack-1x"></span></span></a></th>
+                        <th colspan="2">
+                            <a class="sort-link" href="?order-by={% if order_by and order_by != '-date' %}-date{% else %}date{% endif %}">
+                                Date
+                                <span class="fa-stack">
+                                    <span class="fa fa-sort-asc {% if order_by and order_by != '-date' %}text-muted{% endif %} fa-stack-1x"></span>
+                                    <span class="fa fa-sort-desc {% if order_by != 'date' %}text-muted{% endif %} fa-stack-1x"></span>
+                                </span>
+                            </a>
+                        </th>
+                        <th>
+                            <a class="sort-link" href="?order-by={% if order_by and order_by == '-takings' %}takings{% else %}-takings{% endif %}">
+                                Takings
+                                <span class="fa-stack">
+                                    <span class="fa fa-sort-asc {% if order_by != '-takings' %}text-muted{% endif %} fa-stack-1x"></span>
+                                    <span class="fa fa-sort-desc {% if order_by != 'takings' %}text-muted{% endif %} fa-stack-1x"></span>
+                                </span>
+                            </a>
+                        </th>
+                        <th id="difference-head">
+                            <a class="sort-link" href="?order-by={% if order_by and order_by == '-difference' %}difference{% else %}-difference{% endif %}">
+                                Difference
+                                <span class="fa-stack">
+                                    <span class="fa fa-sort-asc {% if order_by != '-difference' %}text-muted{% endif %} fa-stack-1x"></span>
+                                    <span class="fa fa-sort-desc {% if order_by != 'difference' %}text-muted{% endif %} fa-stack-1x"></span>
+                                </span>
+                            </a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="till-takings-list-body">
