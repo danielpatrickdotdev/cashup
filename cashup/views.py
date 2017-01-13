@@ -47,6 +47,16 @@ class BusinessUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
         return self.request.user.profile.business
 
 
+#--------- Personnel model views ---------#
+
+class PersonnelListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = 'cashup.view_personnel_list'
+
+    def get_queryset(self):
+        return Personnel.objects.filter(
+            business=self.request.user.profile.business)
+
+
 #--------- Outlet model views ---------#
 
 class OutletListView(LoginRequiredMixin, ListView):

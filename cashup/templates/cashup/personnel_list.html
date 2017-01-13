@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% load humanize %}
+{% block title %}Staff | {{ block.super }}{% endblock %}
+{% block style %}{{ block.super }}{% endblock %}
+{% block content %}
+            <h1>Staff</h1>{% if not object_list %}
+            <p class="head">You don't have any staff yet :(</p>
+            <p>Why not <a href="/todo/">invite some</a>? :D</p>{% else %}
+            <p class="head">At {{ request.user.profile.business }}</p>
+            <ul class="list-group">{% for person in object_list %}{% with person.tillclosures.latest.close_time as last_closed %}
+                <a class="list-group-item-action" href="{{ person.get_absolute_url }}">
+                    <li class="list-group-item justify-content-between">
+                        <h5 class-"mb-1">{{ person.name }} <a class="list-group-item-action" href="/todo/"><span class="fa fa-wrench"></span></a></h5>
+                        <small>{% if last_closed %}Last closed a till {{ last_closed|naturaltime }}{% else %}Hasn't closed a till yet{% endif %}</small>
+                    </li>
+                </a>{% endwith %}{% endfor %}
+            </ul>{% endif %}
+        {% endblock %}
