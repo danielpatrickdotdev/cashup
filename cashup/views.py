@@ -5,7 +5,7 @@ from django.views.generic import (ListView, DetailView, CreateView, UpdateView,
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db.models import Sum, F
 
 import rules
@@ -42,6 +42,7 @@ class BusinessUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
                                                                 UpdateView):
     permission_required = 'cashup.change_business'
     fields = ['name']
+    success_url = reverse_lazy('cashup_business_detail')
 
     def get_object(self):
         return self.request.user.profile.business

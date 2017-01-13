@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% load staticfiles %}{% load rules %}
+{% block title %}{{ block.super }}{% endblock %}
+    {% block head %}{{ block.super }}{% endblock %}
+        {% block style %}{{ block.super }}{% endblock %}
+    {% block content %}
+    <h1>{{ object.name }}</h1>
+    {% with object.outlets.count as num_outlets %}
+    <p>Has {{ num_outlets }} <a href="{% url "cashup_outlet_list" %}">outlet{{ num_outlets|pluralize }}</a></p>
+    {% endwith %}
+        {% has_perm 'cashup.change_business' user object as can_edit %}
+        {% if can_edit %}
+        <div class="row btn-block-row">
+            {% if can_edit %}
+            <div class="col-sm-4">
+                <a href="{% url 'cashup_business_update' %}" class="btn btn-primary btn-block">Edit</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+{% endblock %}

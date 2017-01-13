@@ -4,7 +4,9 @@ from . import views
 urlpatterns = [
     url(r'^$', views.SimpleHomeRedirectView.as_view(),
         name='home'),
-    url(r'^business/$', views.BusinessUpdateView.as_view(),
+    url(r'^business/$', views.BusinessDetailView.as_view(),
+        name='cashup_business_detail'),
+    url(r'^business/settings/$', views.BusinessUpdateView.as_view(),
         name='cashup_business_update'),
     url(r'^staff/$',
         views.PersonnelListView.as_view(),
