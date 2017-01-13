@@ -1,0 +1,15 @@
+{% extends "cashup/tillclosure_list_base.html" %}{% load rules %}
+{% block title %}{{ personnel.name }} | {{ block.super }}{% endblock %}
+            {% block heading %}
+            <h1>{{ personnel.name }}</h1>
+            <p class="head">User cashing up history</p>
+            {% has_perm 'cashup.view_personnel_tillclosure_audit_trail' user personnel as can_audit %}
+            {% if can_audit %}
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input id="showdeleted" class="form-check-input" type="checkbox" value="showdeleted">
+                    Show deleted
+                </label>
+            </div>
+            {% endif %}
+            {% endblock %}

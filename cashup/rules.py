@@ -16,6 +16,22 @@ def is_business_owner(user, business):
 rules.add_perm('cashup.view_business', is_business_owner)
 rules.add_perm('cashup.change_business', is_business_owner)
 
+# Personnel rules
+
+@rules.predicate
+def is_personnel_business_owner(user, personnel):
+    return is_business_owner(user, personnel.business)
+
+@rules.predicate
+def is_personnel(user, personnel):
+    return user.profile == personnel
+
+rules.add_perm('cashup.view_personnel_tillclosure_list',
+    is_personnel | is_personnel_business_owner)
+
+rules.add_perm('cashup.view_personnel_tillclosure_audit_trail',
+    is_personnel_business_owner)
+
 # Outlet rules
 
 @rules.predicate

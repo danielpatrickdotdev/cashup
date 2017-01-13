@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% block title %}{{ outlet.name }} | {{ block.super }}{% endblock %}
 {% block style %}{{ block.super }}
             #till-takings-list-head th,
             #till-takings-list-head-2 th,
@@ -60,17 +59,7 @@
                 font-weight: bold;
             }{% endblock %}
             {% block content %}{% load rules %}
-            <h1>{{ outlet.name }}</h1>
-            <p class="head">Outlet cashing up history</p>
-            {% has_perm 'cashup.view_outlet_tillclosure_audit_trail' user outlet as can_audit %}
-            {% if can_audit %}
-            <div class="form-check">
-                <label class="form-check-label">
-                    <input id="showdeleted" class="form-check-input" type="checkbox" value="showdeleted">
-                    Show deleted
-                </label>
-            </div>
-            {% endif %}
+            {% block heading %}{% endblock %}
             <table class="table table-bordered">
                 <thead id="till-takings-list-head" class="thead-inverse">
                     <tr>

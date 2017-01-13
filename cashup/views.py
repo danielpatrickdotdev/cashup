@@ -11,7 +11,7 @@ from django.db.models import Sum, F
 import rules
 from rules.contrib.views import PermissionRequiredMixin
 
-from .models import Business, Outlet, TillClosure
+from .models import Business, Outlet, TillClosure, Personnel
 from .forms import OutletForm
 
 
@@ -99,13 +99,8 @@ class OutletTillClosureMixin(object):
 
 
 
-class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
+class TillClosureListViewBase(LoginRequiredMixin, PermissionRequiredMixin,
                                                 SingleObjectMixin, ListView):
-    template_name = 'cashup/tillclosure_list.html'
-    context_object_name = 'outlet'
-    permission_required = ['cashup.view_outlet', 'cashup.view_tillclosures_for_outlet']
-    slug_url_kwarg = 'name'
-    slug_field = 'name'
     order_dict = {'date': 'close_time',
                   '-date': '-close_time',
                   'takings': 'total_takings',
@@ -115,31 +110,27 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(OutletClosureListView, self).get(request, *args, **kwargs)
-
-    def get_object(self, *args, **kwargs):
-        return super(OutletClosureListView, self).get_object(
-            queryset=self.request.user.profile.outlets.all(), *args, **kwargs)
+        return super(TillClosureListViewBase, self).get(request, *args, **kwargs)
 
     def has_audit_perms(self):
-        return self.request.user.has_perm(
-            'cashup.view_outlet_tillclosure_audit_trail', self.object)
+        return self.request.user.has_perm(self.audit_perms, self.object)
 
     def get_queryset(self):
+        """
+        must be overridden to ensure self.queryset is instantiated before
+        calling this method via super()
+        """
         show_deleted = self.request.GET.get('showdeleted', 0) == '1'
         order_by = self.request.GET.get('order-by', None)
-        if show_deleted and self.has_audit_perms():
-            self.queryset = TillClosure.audit_trail.filter(
-                pk=F('identity'), outlet=self.object)
-        else:
-            self.queryset = self.object.tillclosures.all()
+        if not show_deleted or not self.has_audit_perms():
+            self.queryset = self.queryset.filter(version_superseded_time=None)
         if order_by in self.order_dict:
             self.order_by = order_by
             self.queryset = self.queryset.order_by(self.order_dict[order_by])
         return self.queryset
 
     def get_context_data(self, *args, **kwargs):
-        context = super(OutletClosureListView, self).get_context_data(
+        context = super(TillClosureListViewBase, self).get_context_data(
             *args, **kwargs)
         if hasattr(self, 'order_by'):
             context['order_by'] = self.order_by
@@ -147,6 +138,42 @@ class OutletClosureListView(LoginRequiredMixin, PermissionRequiredMixin,
             total_takings=Sum('total_takings'),
             till_difference=Sum('till_difference'))
         return context
+
+
+class OutletTillClosureListView(TillClosureListViewBase):
+    template_name = 'cashup/outlet_tillclosure_list.html'
+    context_object_name = 'outlet'
+    permission_required = ['cashup.view_outlet', 'cashup.view_tillclosures_for_outlet']
+    audit_perms = 'cashup.view_outlet_tillclosure_audit_trail'
+    slug_url_kwarg = 'name'
+    slug_field = 'name'
+
+    def get_object(self, *args, **kwargs):
+        return super(OutletTillClosureListView, self).get_object(
+            queryset=self.request.user.profile.outlets.all(), *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = TillClosure.audit_trail.filter(
+            pk=F('identity'), outlet=self.object)
+        return super(OutletTillClosureListView, self).get_queryset()
+
+
+class PersonnelTillClosureListView(TillClosureListViewBase):
+    template_name = 'cashup/personnel_tillclosure_list.html'
+    context_object_name = 'personnel'
+    permission_required = ['cashup.view_personnel_tillclosure_list']
+    audit_perms = 'cashup.view_personnel_tillclosure_audit_trail'
+    slug_url_kwarg = 'username'
+    slug_field = 'user__username'
+
+    def get_object(self, *args, **kwargs):
+        return super(PersonnelTillClosureListView, self).get_object(
+            queryset=Personnel.objects.all(), *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = TillClosure.audit_trail.filter(
+            pk=F('identity'), closed_by=self.object)
+        return super(PersonnelTillClosureListView, self).get_queryset()
 
 
 class TillClosureAuditTrailListView(LoginRequiredMixin, PermissionRequiredMixin,
