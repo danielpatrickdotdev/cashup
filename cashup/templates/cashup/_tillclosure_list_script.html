@@ -1,0 +1,37 @@
+        <script>
+            $(document).ready(function() {
+                var setOrderByParam = function(orderBy) {
+                    return function() {
+                        const url = new URL($(this).prop("href"));
+                        url.searchParams.set("order-by", orderBy);
+                        $(this).prop("href", url.toString());
+                    };
+                }
+                var setShowDeletedParam = function() {
+                    const url = new URL($(this).prop("href"));
+                    url.searchParams.set("showdeleted", 1);
+                    $(this).prop("href", url.toString());
+                }
+                const params = new URLSearchParams(location.search);
+                if (params.get('showdeleted') === "1") {
+                    $("input#showdeleted").prop("checked", true);
+                    $("a.page-link").each(setShowDeletedParam);
+                    $("a.sort-link").each(setShowDeletedParam);
+                }
+                if (params.has('order-by')) {
+                    var orderBy = params.get('order-by');
+                    $("a.page-link").each(setOrderByParam(orderBy));
+                }
+                $("input:checkbox#showdeleted").change(function() {
+                    const url = new URL(location);
+                    if ($(this).prop("checked")) {
+                        url.searchParams.set('showdeleted', 1);
+                        url.searchParams.delete('page');
+                    } else {
+                        url.searchParams.delete('showdeleted');
+                        url.searchParams.delete('page');
+                    }
+                    location = url.toString();
+                });
+            });
+        </script>
