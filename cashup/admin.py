@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from rules.contrib.admin import ObjectPermissionsModelAdmin
 
-from .models import Business, Outlet, TillClosure, NotesHelpText
+from .models import Business, Outlet, TillClosure, NotesHelpText, Personnel
 
 
 class OutletAdmin(ObjectPermissionsModelAdmin):
@@ -16,5 +16,7 @@ class TillClosureAdmin(ObjectPermissionsModelAdmin):
 admin.site.register(TillClosure, TillClosureAdmin)
 
 admin.site.register(Business)
+
+admin.site.register(Personnel)
 
 admin.site.register(NotesHelpText)
