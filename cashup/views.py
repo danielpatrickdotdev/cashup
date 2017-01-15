@@ -7,12 +7,13 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.db.models import Sum, F
+from django.forms import inlineformset_factory
 
 import rules
 from rules.contrib.views import PermissionRequiredMixin
 
-from .models import Business, Outlet, TillClosure, Personnel
-from .forms import OutletForm
+from .models import Business, Outlet, TillClosure, Personnel, StaffPosition
+from .forms import OutletForm, StaffFormSet, StaffPositionForm
 
 
 # General views
@@ -96,12 +97,55 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
     success_url = '/'
     slug_url_kwarg = 'name'
     slug_field = 'name'
+    staff_form_class = StaffFormSet
+
+    def post(self, request, *args, **kwargs):
+        redirect = super(OutletUpdateView, self).post(request, *args, **kwargs)
+        potential_staff = self.object.business.personnel.exclude(
+            positions__outlet=self.object)
+        initial = [
+            {'personnel': person.pk} for person in potential_staff]
+        Form = inlineformset_factory(Outlet,
+                                     StaffPosition,
+                                     form=StaffPositionForm,
+                                     extra=len(potential_staff))
+        qs = StaffPosition.objects.filter(
+            outlet=self.object).exclude(personnel__is_owner=True)
+        staff_form = Form(request.POST, instance=self.object, queryset=qs,initial=initial)
+        if staff_form.is_valid():
+            staff_form.save()
+        else:
+            self.invalid_staff_form = staff_form
+            return self.render_to_response(self.get_context_data())
+        return redirect
+
+    def create_formset(self):
+        potential_staff = self.object.business.personnel.exclude(
+            positions__outlet=self.object)
+        initial = [
+            {'personnel': person.pk} for person in potential_staff]
+        Form = inlineformset_factory(Outlet,
+                                     StaffPosition,
+                                     form=StaffPositionForm,
+                                     extra=len(potential_staff))
+        qs = StaffPosition.objects.filter(
+            outlet=self.object).exclude(personnel__is_owner=True)
+        return Form(instance=self.object, queryset=qs, initial=initial)
 
     def get_queryset(self):
         return self.request.user.profile.outlets.all()
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(OutletUpdateView, self).get_context_data(
+            *args, **kwargs)
+        if hasattr(self, 'invalid_staff_form'):
+            context['staff_forms'] = self.invalid_staff_form
+        else:
+            context['staff_forms'] = self.create_formset()
+        return context
 
 
 class OutletCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
