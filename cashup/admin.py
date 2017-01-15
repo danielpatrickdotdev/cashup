@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from rules.contrib.admin import ObjectPermissionsModelAdmin
 
-from .models import Business, Outlet, TillClosure, NotesHelpText, Personnel
+from .models import (Business, Outlet, TillClosure, NotesHelpText, Personnel,
+                     StaffPosition)
 
 
 class OutletAdmin(ObjectPermissionsModelAdmin):
@@ -17,6 +18,16 @@ admin.site.register(TillClosure, TillClosureAdmin)
 
 admin.site.register(Business)
 
-admin.site.register(Personnel)
+
+class StaffPositionInline(admin.TabularInline):
+    extra = 0
+    model = StaffPosition
+
+class PersonnelAdmin(admin.ModelAdmin):
+    inlines = [
+        StaffPositionInline,
+    ]
+
+admin.site.register(Personnel, PersonnelAdmin)
 
 admin.site.register(NotesHelpText)

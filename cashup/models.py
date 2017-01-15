@@ -85,6 +85,14 @@ class StaffPosition(models.Model):
         on_delete=models.CASCADE)
     is_manager = models.BooleanField(default=False)
 
+    @property
+    def title(self):
+        return 'Manager' if self.is_manager else "Staff"
+
+    def __str__(self):
+        return "{}, {} {}".format(
+            self.personnel.name, self.outlet.name, self.title)
+
     class Meta:
         unique_together = ('outlet', 'personnel')
 
