@@ -63,7 +63,7 @@ class Outlet(models.Model):
     business = models.ForeignKey(Business, related_name='outlets',
         on_delete=models.CASCADE)
     personnel = models.ManyToManyField(Personnel, related_name='outlets',
-        through='StaffPositions')
+        through='StaffPosition')
     name = models.SlugField(max_length=24, help_text='Enter a shop name or location')
     default_float = models.DecimalField(max_digits=12, decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00'))])
@@ -78,7 +78,7 @@ class Outlet(models.Model):
         unique_together = ('name', 'business')
 
 
-class StaffPositions(models.Model):
+class StaffPosition(models.Model):
     personnel = models.ForeignKey(Personnel, related_name='positions',
         on_delete=models.CASCADE)
     outlet = models.ForeignKey(Outlet, related_name='staff',
