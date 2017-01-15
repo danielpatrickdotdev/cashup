@@ -38,6 +38,10 @@ class Personnel(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('cashup_personnel_detail',
+                       kwargs={'username': self.user.username})
+
     class Meta:
         verbose_name_plural = 'Personnel'
 
