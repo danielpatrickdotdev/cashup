@@ -29,9 +29,9 @@ class Personnel(models.Model):
         return name or self.user.username
 
     @transaction.atomic
-    def save(self):
-        if self.is_owner and  Personnel.objects.filter(
-                        self.business, is_owner=True).exists():
+    def save(self, *args, **kwargs):
+        if self.is_owner and Personnel.objects.exclude(pk=self.pk).filter(
+            business=self.business, is_owner=True).exists():
             self.is_owner = False
         super(Personnel, self).save(*args, **kwargs)
 
