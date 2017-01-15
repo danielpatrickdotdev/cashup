@@ -35,6 +35,9 @@ class Personnel(models.Model):
             self.is_owner = False
         super(Personnel, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name_plural = 'Personnel'
+
 
 class Business(models.Model):
     name = models.CharField(max_length=20)
@@ -44,6 +47,9 @@ class Business(models.Model):
 
     def get_absolute_url(self):
         return reverse('cashup_business_update')
+
+    class Meta:
+        verbose_name_plural = 'Businesses'
 
 
 class Outlet(models.Model):
