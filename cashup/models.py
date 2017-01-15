@@ -53,7 +53,7 @@ class Business(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('cashup_business_update')
+        return reverse('cashup_business_detail')
 
     class Meta:
         verbose_name_plural = 'Businesses'
