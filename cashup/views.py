@@ -50,6 +50,17 @@ class BusinessUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
 
 #--------- Personnel model views ---------#
 
+class PersonnelDetailView(LoginRequiredMixin, PermissionRequiredMixin,
+                                                                DetailView):
+    permission_required = 'cashup.view_personnel'
+    slug_url_kwarg = 'username'
+    slug_field = 'user__username'
+
+    def get_queryset(self):
+        return Personnel.objects.filter(
+            business=self.request.user.profile.business)
+
+
 class PersonnelListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = 'cashup.view_personnel_list'
 

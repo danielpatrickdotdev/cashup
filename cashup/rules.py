@@ -26,7 +26,15 @@ def is_personnel_business_owner(user, personnel):
 def is_personnel(user, personnel):
     return user.profile == personnel
 
+rules.add_perm('cashup.view_personnel',
+    is_personnel | is_personnel_business_owner)
+
+rules.add_perm('cashup.change_personnel', is_personnel_business_owner)
+
 rules.add_perm('cashup.view_personnel_list', is_a_business_owner)
+
+rules.add_perm('cashup.view_personnel_outlet_list',
+    is_personnel | is_personnel_business_owner)
 
 rules.add_perm('cashup.view_personnel_tillclosure_list',
     is_personnel | is_personnel_business_owner)

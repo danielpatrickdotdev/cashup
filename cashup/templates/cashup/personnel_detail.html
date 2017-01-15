@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% load rules %}{% load humanize %}
+{% block title %}{{ personnel.name }} | {{ block.super }}{% endblock %}
+{% block style %}{{ block.super }}
+{% include "cashup/_tillclosure_list_style.html" %}
+{% endblock %}
+            {% block content %}
+            <h1>{{ personnel.name }}</h1>
+            <p class="head"></p>
+            {% has_perm 'cashup.view_personnel_outlet_list' user personnel as can_view_outlets %}
+            {% if can_view_outlets %}
+            <ul class="list-group">{% for outlet in personnel.outlets.all %}{% with outlet.tillclosures.latest.close_time as last_closed %}{% has_perm 'cashup.change_outlet' user outlet as can_change_outlet %}
+                <a class="list-group-item-action" href="{{ outlet.get_absolute_url }}">
+                    <li class="list-group-item justify-content-between">
+                        <h5 class-"mb-1">{{ outlet.name }}{% if can_change_outlet %} <a class="list-group-item-action" href="{% url 'cashup_outlet_settings' outlet.name %}"><span class="fa fa-wrench"></span></a>{% endif %}</h5>
+                        <small>{% if last_closed %}Last closed {{ last_closed|naturaltime }}{% else %}Not closed{% endif %}</small>
+                    </li>
+                </a>{% endwith %}{% endfor %}
+            </ul>
+            {% endif %}
+            {% endblock %}
