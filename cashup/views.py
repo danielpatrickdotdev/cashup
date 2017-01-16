@@ -86,7 +86,7 @@ class PersonnelListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class OutletListView(LoginRequiredMixin, ListView):
     # perms not required as only displays user's workplaces
     def get_queryset(self):
-        return self.request.user.profile.outlets.all()
+        return Outlet.objects.for_personnel(self.request.user.profile)
 
 
 class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,

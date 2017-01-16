@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator
 
 from .modelfields import DenominationCountField
-from .managers import AuditTrailManager
+from .managers import AuditTrailManager, OutletQuerySet
 
 def time():
     return timezone.now().replace(second=0, microsecond=0)
@@ -68,6 +68,8 @@ class Outlet(models.Model):
     name = models.SlugField(max_length=24, help_text='Enter a shop name or location')
     default_float = models.DecimalField(max_digits=12, decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00'))])
+
+    objects = OutletQuerySet.as_manager()
 
     def __str__(self):
         return "{} Outlet".format(self.name)
