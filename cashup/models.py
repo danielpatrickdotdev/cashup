@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator
 
 from .modelfields import DenominationCountField
+from .managers import AuditTrailManager
 
 def time():
     return timezone.now().replace(second=0, microsecond=0)
@@ -95,12 +96,6 @@ class StaffPosition(models.Model):
 
     class Meta:
         unique_together = ('outlet', 'personnel')
-
-
-class AuditTrailManager(models.Manager):
-    def get_queryset(self):
-        return super(AuditTrailManager, self).get_queryset().filter(
-            version_superseded_time=None)
 
 
 class TillClosure(models.Model):
