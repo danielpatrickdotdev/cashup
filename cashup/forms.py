@@ -16,7 +16,6 @@ class OutletForm(forms.ModelForm):
         fields = ['name', 'default_float']
 
 class StaffPositionForm(forms.ModelForm):
-    is_staff = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         if 'initial' in kwargs and 'personnel' in kwargs['initial']:
@@ -34,13 +33,6 @@ class StaffPositionForm(forms.ModelForm):
         o = self.cleaned_data.get('outlet', None)
         if p and o and p.business != o.business:
             self._update_errors("Invalid staff choice for business")
-        is_staff = self.cleaned_data.get('is_staff', False)
-        is_manager = self.cleaned_data.get('is_manager', False)
-        if not (is_staff or is_manager):
-            self.cleaned_data['DELETE'] = True
-        else:
-            if is_manager:
-                self.cleaned_data['is_staff'] = True
 
 
     class Meta:

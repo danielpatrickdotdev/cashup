@@ -54,7 +54,7 @@ def is_outlet_manager(user, outlet):
 
 @rules.predicate
 def is_outlet_staff(user, outlet):
-    return outlet.staff.filter(personnel=user.profile).exists()
+    return outlet.staff.filter(personnel=user.profile, is_staff=True).exists()
 
 rules.add_perm('cashup.change_outlet', is_outlet_owner | is_outlet_manager)
 rules.add_perm('cashup.view_outlet', is_outlet_owner | is_outlet_staff)

@@ -23,7 +23,8 @@ class SimpleHomeRedirectView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         try:
-            outlet = self.request.user.profile.outlets.get()
+            outlet = Outlet.objects.for_personnel(
+                self.request.user.profile).get()
         except (Outlet.DoesNotExist, Outlet.MultipleObjectsReturned):
             return reverse('cashup_outlet_list')
         return outlet.get_absolute_url()
@@ -108,7 +109,8 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
         Form = inlineformset_factory(Outlet,
                                      StaffPosition,
                                      form=StaffPositionForm,
-                                     extra=len(potential_staff))
+                                     extra=len(potential_staff),
+                                     can_delete=False)
         qs = StaffPosition.objects.filter(
             outlet=self.object).exclude(personnel__is_owner=True)
         staff_form = Form(request.POST, instance=self.object, queryset=qs,initial=initial)
@@ -127,13 +129,14 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
         Form = inlineformset_factory(Outlet,
                                      StaffPosition,
                                      form=StaffPositionForm,
-                                     extra=len(potential_staff))
+                                     extra=len(potential_staff),
+                                     can_delete=False)
         qs = StaffPosition.objects.filter(
             outlet=self.object).exclude(personnel__is_owner=True)
         return Form(instance=self.object, queryset=qs, initial=initial)
 
     def get_queryset(self):
-        return self.request.user.profile.outlets.all()
+        return Outlet.objects.for_personnel(self.request.user.profile)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -226,8 +229,9 @@ class OutletTillClosureListView(TillClosureListViewBase):
     slug_field = 'name'
 
     def get_object(self, *args, **kwargs):
+        queryset=Outlet.objects.for_personnel(self.request.user.profile)
         return super(OutletTillClosureListView, self).get_object(
-            queryset=self.request.user.profile.outlets.all(), *args, **kwargs)
+            queryset=queryset, *args, **kwargs)
 
     def get_queryset(self):
         self.queryset = TillClosure.audit_trail.filter(

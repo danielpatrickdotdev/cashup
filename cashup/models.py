@@ -87,6 +87,7 @@ class StaffPosition(models.Model):
     outlet = models.ForeignKey(Outlet, related_name='staff',
         on_delete=models.CASCADE)
     is_manager = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     @property
     def title(self):

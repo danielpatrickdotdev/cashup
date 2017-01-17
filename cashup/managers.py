@@ -21,13 +21,12 @@ class OutletQuerySet(models.QuerySet):
         manage.
         """
         filters = [
-            (Q(business__personnel=personnel) &
-             Q(business__personnel__is_owner=True)),
+            Q(business__personnel=personnel) &
+                Q(business__personnel__is_owner=True),
+            Q(staff__is_manager=True) & Q(staff__personnel=personnel)
         ]
-        if is_manager:
-            filters.append((Q(staff__is_manager=True) &
-                            Q(staff__personnel=personnel)))
-        else:
-            filters.append(Q(staff__personnel=personnel))
+        if not is_manager:
+            filters.append(
+                Q(staff__is_staff=True) & Q(staff__personnel=personnel))
         q_obj = reduce(operator.or_, filters)
         return self.filter(q_obj).distinct().order_by('name')
