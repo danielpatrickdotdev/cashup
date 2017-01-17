@@ -4,7 +4,7 @@ from django.db import models, transaction
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 
 from .modelfields import DenominationCountField
 from .managers import AuditTrailManager, OutletQuerySet
@@ -60,22 +60,35 @@ class Business(models.Model):
         verbose_name_plural = 'Businesses'
 
 
+outlet_name_validator = RegexValidator(
+    regex='^[a-zA-Z0-9]+([ ][a-zA-Z0-9]+)*$',
+    message='Only letters, numbers and single spaces allowed',
+    code='invalid_name'
+)
+
 class Outlet(models.Model):
     business = models.ForeignKey(Business, related_name='outlets',
         on_delete=models.CASCADE)
     personnel = models.ManyToManyField(Personnel, related_name='outlets',
         through='StaffPosition')
-    name = models.SlugField(max_length=24, help_text='Enter a shop name or location')
+    name = models.CharField(max_length=24,
+                            help_text='Enter a shop name or location',
+                            validators=[outlet_name_validator])
+    slug = models.SlugField(max_length=24, editable=False)
     default_float = models.DecimalField(max_digits=12, decimal_places=2,
         validators=[MinValueValidator(Decimal('0.00'))])
 
     objects = OutletQuerySet.as_manager()
 
+    def save(self, *args, **kwargs):
+        self.slug = self.name.replace(' ', '-')
+        super(Outlet, self).save(*args, **kwargs)
+
     def __str__(self):
         return "{} Outlet".format(self.name)
 
     def get_absolute_url(self):
-        return reverse('cashup_outlet_detail', kwargs={'name':self.name})
+        return reverse('cashup_outlet_detail', kwargs={'slug':self.slug})
 
     class Meta:
         unique_together = ('name', 'business')

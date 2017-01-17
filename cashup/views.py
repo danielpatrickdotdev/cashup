@@ -96,8 +96,6 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
     permission_required = 'cashup.change_outlet'
     form_class = OutletForm
     success_url = '/'
-    slug_url_kwarg = 'name'
-    slug_field = 'name'
     staff_form_class = StaffFormSet
 
     def post(self, request, *args, **kwargs):
@@ -215,8 +213,6 @@ class OutletTillClosureListView(TillClosureListViewBase):
     context_object_name = 'outlet'
     permission_required = ['cashup.view_outlet', 'cashup.view_tillclosures_for_outlet']
     audit_perms = 'cashup.view_outlet_tillclosure_audit_trail'
-    slug_url_kwarg = 'name'
-    slug_field = 'name'
 
     def get_object(self, *args, **kwargs):
         queryset=Outlet.objects.for_personnel(self.request.user.profile)
@@ -334,8 +330,8 @@ class TillClosureCreateView(LoginRequiredMixin, TillClosureFormMixin, CreateView
 
     def get_outlet(self):
         if not hasattr(self, 'outlet') or self.outlet is None:
-            outlet_name = self.kwargs.get('name')
-            self.outlet = get_object_or_404(Outlet, name=outlet_name,
+            slug = self.kwargs.get('slug')
+            self.outlet = get_object_or_404(Outlet, slug=slug,
                 business=self.request.user.profile.business)
         return self.outlet
 

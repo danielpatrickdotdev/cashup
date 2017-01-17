@@ -72,9 +72,9 @@
                     {% if num_outlets == 1 %}
                     {# user only associated with one outlet -> simple menu #}
                     {% with outlets.get as outlet %}
-                    {% url 'cashup_closure_create' outlet.name as closure_create_url %}
-                    {% url 'cashup_outlet_detail' outlet.name as outlet_detail_url %}
-                    {% url 'cashup_outlet_settings' outlet.name as outlet_settings_url %}
+                    {% url 'cashup_closure_create' outlet.slug as closure_create_url %}
+                    {% url 'cashup_outlet_detail' outlet.slug as outlet_detail_url %}
+                    {% url 'cashup_outlet_settings' outlet.slug as outlet_settings_url %}
                     <a class="nav-item nav-link{% if this_url == closure_create_url %} active{% endif %}" href="{{ closure_create_url }}"><span class="fa fa-pencil"></span> Cash Up</a>
                     <a class="nav-item nav-link{% if this_url == outlet_detail_url %} active{% endif %}" href="{{ outlet_detail_url }}"><span class="fa fa-history"></span> History</a>
                     {% has_perm 'cashup.change_outlet' user outlet as can_change_outlet %}
@@ -104,9 +104,9 @@
                     {# /outlets menu #}
                     {% if outlet %}
                     {# outlet extra menu #}
-                    {% url 'cashup_closure_create' outlet.name as closure_create_url %}
-                    {% url 'cashup_outlet_detail' outlet.name as outlet_detail_url %}
-                    {% url 'cashup_outlet_settings' outlet.name as outlet_settings_url %}
+                    {% url 'cashup_closure_create' outlet.slug as closure_create_url %}
+                    {% url 'cashup_outlet_detail' outlet.slug as outlet_detail_url %}
+                    {% url 'cashup_outlet_settings' outlet.slug as outlet_settings_url %}
                     <div class="nav-item dropdown">
                         <a id="outlet-extra-dropdown-menu-link" class="nav-link active dropdown-toggle" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-shopping-bag"></span> {{ outlet.name }}</a>
                         <div class="dropdown-menu" aria-labelledby="outlet-extra-dropdown-menu-link">
