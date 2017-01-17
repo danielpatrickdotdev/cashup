@@ -102,18 +102,8 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
 
     def post(self, request, *args, **kwargs):
         redirect = super(OutletUpdateView, self).post(request, *args, **kwargs)
-        potential_staff = self.object.business.personnel.exclude(
-            positions__outlet=self.object)
-        initial = [
-            {'personnel': person.pk} for person in potential_staff]
-        Form = inlineformset_factory(Outlet,
-                                     StaffPosition,
-                                     form=StaffPositionForm,
-                                     extra=len(potential_staff),
-                                     can_delete=False)
-        qs = StaffPosition.objects.filter(
-            outlet=self.object).exclude(personnel__is_owner=True)
-        staff_form = Form(request.POST, instance=self.object, queryset=qs,initial=initial)
+
+        staff_form = self.create_formset(request.POST)
         if staff_form.is_valid():
             staff_form.save()
         else:
@@ -121,7 +111,7 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
             return self.render_to_response(self.get_context_data())
         return redirect
 
-    def create_formset(self):
+    def create_formset(self, data=None):
         potential_staff = self.object.business.personnel.exclude(
             positions__outlet=self.object)
         initial = [
@@ -133,7 +123,7 @@ class OutletUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
                                      can_delete=False)
         qs = StaffPosition.objects.filter(
             outlet=self.object).exclude(personnel__is_owner=True)
-        return Form(instance=self.object, queryset=qs, initial=initial)
+        return Form(data, instance=self.object, queryset=qs, initial=initial)
 
     def get_queryset(self):
         return Outlet.objects.for_personnel(self.request.user.profile)
