@@ -6,7 +6,7 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
         <link rel="stylesheet" href="{% static "css/font-awesome.min.css" %}">
-        <title>{% block title %}{% if user.profile.business %}{{ user.profile.business.name }} | {% endif %}Cashitup{% endblock %}</title>{% endblock %}
+        <title>{% block title %}{% if business %}{{ business.name }} | {% endif %}Cashitup{% endblock %}</title>{% endblock %}
         <style>{% block style %}
             .navbar {
                 margin-bottom: 10px;
@@ -68,10 +68,10 @@
                 </div>
                 {% if user.is_authenticated %}
                 <div class="navbar-nav"> 
-                    {% with user.profile.outlets.all|length as num_outlets %}
+                    {% with outlets|length as num_outlets %}
                     {% if num_outlets == 1 %}
                     {# user only associated with one outlet -> simple menu #}
-                    {% with user.profile.outlets.get as outlet %}
+                    {% with outlets.get as outlet %}
                     {% url 'cashup_closure_create' outlet.name as closure_create_url %}
                     {% url 'cashup_outlet_detail' outlet.name as outlet_detail_url %}
                     {% url 'cashup_outlet_settings' outlet.name as outlet_settings_url %}
@@ -91,7 +91,7 @@
                         <div class="dropdown-menu" aria-labelledby="outlets-dropdown-menu-link">
                             <a class="dropdown-item{% if this_url == outlets_url %} active{% endif %}" href="{{ outlets_url }}"><span class="fa fa-globe"></span> All</a>
                             <div class="dropdown-divider"></div>
-                            {% for outlet_ in user.profile.outlets.all %}
+                            {% for outlet_ in outlets %}
                             <a class="dropdown-item{% if outlet == outlet_ %} active{% endif %}" href="{{ outlet_.get_absolute_url }}"><span class="fa fa-map-marker"></span> {{ outlet_.name }}</a>
                             {% endfor %}
                             {% has_perm 'cashup.create_outlet' user as can_create_outlet %}
