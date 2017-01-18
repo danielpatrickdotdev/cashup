@@ -3,6 +3,20 @@
         {% block stylesheets %}{{ block.super }}
         <link rel="stylesheet" href="{% static "css/flatpickr.min.css" %}">{% endblock %}
         {% block style %}{{ block.super }}
+            /* Cashup form styles
+            -------------------------------------------------- */
+            input#id_close_time {
+                background-color: #fff;
+                color: #44495c;
+            }
+            #closed-by-input-group span.input-group-addon {
+                padding-left: 0.65625rem;
+                padding-right: 0.65625rem;
+            }
+            #close-time-input-group span.input-group-addon {
+                padding-left: 0.59375rem;
+                padding-right: 0.59375rem;
+            }
             .money-input {
                 text-align: right;
             }{% endblock %}
@@ -20,11 +34,11 @@
                 {% endif %}
                 {% if object %}
                 <div id="closed_by-form-field" class="form-group row form-field dummy-form-field">
-                    <label class="col-xs-5 col-sm-6 col-form-label" for="id_closed_by">Closed by</label>
-                    <div class="col-xs-7 col-sm-6">
-                        <div class="input-group">
-                            <input id="id_closed_by" class="form-control" type="text" value="{{ object.closed_by.name }}" disabled>
+                    <label class="col-xs-5 col-sm-7 col-form-label" for="id_closed_by">Closed by</label>
+                    <div class="col-xs-7 col-sm-5">
+                        <div id="closed-by-input-group" class="input-group">
                             <span class="input-group-addon"><span class="fa fa-user"></span></span>
+                            <input id="id_closed_by" class="form-control" type="text" value="{{ object.closed_by.name }}" disabled>
                         </div>
                     </div>
                 </div>
@@ -47,11 +61,11 @@
                 <div id="{{ field.name }}-form-field" class="form-group row form-field">
                     {% if forloop.counter == 1 %}
                     {# close_time #}
-                    <label class="col-xs-5 col-sm-6 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    <div class="col-xs-7 col-sm-6">
-                        <div class="input-group">
-                            <input id="{{ field.id_for_label }}" class="form-control" name="{{ field.name }}" type="text" value="{{ field.value|date:"Y-m-d H:i" }}" data-input required>
+                    <label class="col-xs-5 col-sm-7 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="col-xs-7 col-sm-5">
+                        <div id="close-time-input-group" class="input-group">
                             <span class="input-group-addon btn" data-toggle><span class="fa fa-clock-o"></span></span>
+                            <input id="{{ field.id_for_label }}" class="form-control" name="{{ field.name }}" type="text" value="{{ field.value|date:"Y-m-d H:i" }}" data-input required>
                         </div>
                     </div>
                     {# /close_time #}
