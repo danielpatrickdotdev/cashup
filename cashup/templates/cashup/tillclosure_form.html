@@ -1,5 +1,7 @@
 {% extends "base.html" %}{% load staticfiles %}
 {% block title %}{% if object %}Edit till close{% else %}Close till{% endif %} | {{ outlet.name }} | {{ block.super }}{% endblock %}
+        {% block stylesheets %}{{ block.super }}
+        <link rel="stylesheet" href="{% static "css/flatpickr.min.css" %}">{% endblock %}
         {% block style %}{{ block.super }}
             .money-input {
                 text-align: right;
@@ -48,9 +50,8 @@
                     <label class="col-xs-5 col-sm-6 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="col-xs-7 col-sm-6">
                         <div class="input-group">
-                            <input id="{{ field.id_for_label }}" class="form-control" name="{{ field.name }}" type="text" value="{{ field.value|date:"Y-m-d H:i" }}" required />
-                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
-                            <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
+                            <input id="{{ field.id_for_label }}" class="form-control" name="{{ field.name }}" type="text" value="{{ field.value|date:"Y-m-d H:i" }}" data-input required>
+                            <span class="input-group-addon btn" data-toggle><span class="fa fa-clock-o"></span></span>
                         </div>
                     </div>
                     {# /close_time #}
@@ -178,4 +179,18 @@
             </form>
         {% endblock %}
         {% block script %}{{ block.super }}
-        <script src="{% static "js/cashup-form.js" %}"></script>{% endblock %}
+        <script src="{% static "js/cashup-form.js" %}"></script>
+        <script src="{% static "js/flatpickr-2.3.4.js" %}"></script>
+        <script>
+            var defaultTime = $("#id_close_time").val().replace(' ', 'T');
+            flatpickr("#close-time-input-group", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24h: true,
+                minuteIncrement: 1,
+                wrap: true,
+                onOpen: function(selectedDates, dateStr, instance) {
+                    instance.setDate(defaultTime);
+                }
+            });
+        </script>{% endblock %}
